@@ -80,18 +80,34 @@ namespace King.Core
                 : FollowCandidates(hand, currentTrick[0].Card.Suit);
         }
 
-        // Leading is unrestricted for now. The hearts-before-broken restriction for the
-        // hearts contracts slots in here.
-        List<Card> LeadCandidates(List<Card> hand) => new List<Card>(hand);
+        // In the hearts contracts a heart may not be led until one has been discarded
+        // on an earlier trick, unless hearts are all the leader has left.
+        List<Card> LeadCandidates(List<Card> hand)
+        {
+            if (LeadingHeartsRestricted && !HeartsBroken)
+            {
+                var offSuit = hand.Where(c => c.Suit != Suit.Hearts).ToList();
+                if (offSuit.Count > 0)
+                    return offSuit;
+            }
+            return new List<Card>(hand);
+        }
+
+        bool LeadingHeartsRestricted =>
+            Contract.Type == ContractType.NoHearts || Contract.Type == ContractType.KingOfHearts;
 
         // Follow suit if able. A void must trump in a trump deal (with no obligation
-        // to beat trumps already on the table); otherwise a void may play anything.
-        // The forced penalty dumps of the card-penalty contracts slot in here.
+        // to beat trumps already on the table); in the card-penalty deals a void must
+        // dump a penalty card if any is held, and a follower whose penalty card is
+        // already outranked on the table must let it go.
         List<Card> FollowCandidates(List<Card> hand, Suit led)
         {
             var inSuit = hand.Where(c => c.Suit == led).ToList();
             if (inSuit.Count > 0)
-                return inSuit;
+            {
+                var beaten = inSuit.Where(c => IsPenaltyCard(c) && c.Rank < HighestOnTable(led)).ToList();
+                return beaten.Count > 0 ? beaten : inSuit;
+            }
 
             if (Contract.TrumpSuit != null)
             {
@@ -100,7 +116,36 @@ namespace King.Core
                     return trumps;
             }
 
+            var dumps = hand.Where(IsPenaltyCard).ToList();
+            if (dumps.Count > 0)
+                return dumps;
+
             return new List<Card>(hand);
+        }
+
+        // Highest rank of the led suit on the trick so far. Only called while
+        // following, so the led card itself guarantees a match.
+        Rank HighestOnTable(Suit led)
+        {
+            var best = Rank.Two;
+            foreach (var play in currentTrick)
+                if (play.Card.Suit == led && play.Card.Rank > best)
+                    best = play.Card.Rank;
+            return best;
+        }
+
+        // Cards that cost their captor points under the current contract. Forced
+        // dumping and early termination both key off this; the queens, men, and
+        // king-of-hearts contracts add their cases with their branches.
+        bool IsPenaltyCard(Card card)
+        {
+            switch (Contract.Type)
+            {
+                case ContractType.NoHearts:
+                    return card.Suit == Suit.Hearts;
+                default:
+                    return false;
+            }
         }
 
         public CompletedTrick Play(Card card)
@@ -130,9 +175,7 @@ namespace King.Core
             history.Add(trick);
             currentTrick.Clear();
 
-            // Early termination for the card-penalty contracts (nothing left in the deal
-            // that can still score) gets decided here once scoring exists.
-            if (history.Count == 13)
+            if (history.Count == 13 || NothingLeftCanScore())
             {
                 IsComplete = true;
             }
@@ -158,8 +201,9 @@ namespace King.Core
             return new DealScore(points, units);
         }
 
-        // Scoring units captured per seat. In a trump deal every trick is a unit; the
-        // penalty contracts land here with their own branches.
+        // Scoring units captured per seat. In a trump deal every trick is a unit; in
+        // the card-penalty deals each captured penalty card charges its trick's
+        // winner. The remaining contracts land here with their own branches.
         int[] CountUnits()
         {
             var units = new int[4];
@@ -169,9 +213,28 @@ namespace King.Core
                     foreach (var trick in history)
                         units[(int)trick.Winner]++;
                     return units;
+                case ContractType.NoHearts:
+                    foreach (var trick in history)
+                        foreach (var play in trick.Plays)
+                            if (IsPenaltyCard(play.Card))
+                                units[(int)trick.Winner]++;
+                    return units;
                 default:
                     throw new NotImplementedException("scoring for " + Contract.Type + " is not implemented yet");
             }
+        }
+
+        // A card-penalty deal stops early once every card that can still score has
+        // been captured. The other contracts hold no penalty cards, so their count
+        // never reaches the target and they always play out all thirteen tricks.
+        bool NothingLeftCanScore()
+        {
+            int captured = 0;
+            foreach (var trick in history)
+                foreach (var play in trick.Plays)
+                    if (IsPenaltyCard(play.Card))
+                        captured++;
+            return captured == Contracts.UnitsInDeal(Contract.Type);
         }
 
         static Seat Next(Seat seat) => (Seat)(((int)seat + 1) % 4);
