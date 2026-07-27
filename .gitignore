@@ -1,0 +1,27 @@
+# unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+*.pidb.meta
+crashlytics-build.properties
+
+# ide junk (unity regenerates these; the dev/ harness project is real and stays)
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.user
+!dev/**/*.csproj
+
+# dotnet test harness
+dev/**/bin/
+dev/**/obj/
+
+# os
+.DS_Store
