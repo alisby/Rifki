@@ -39,3 +39,17 @@ cd dev && dotnet test
 ```
 
 Handy when you want to check a rules change without waiting for the editor.
+
+## CI and builds
+
+Every push and PR runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs zero setup and is the merge gate: if the rules engine is broken, nothing lands.
+
+The rest of the pipeline builds the actual game — WebGL, macOS, Windows and Android, each uploaded as a downloadable artifact — and pushes the WebGL build to GitHub Pages, so the latest main is always playable at https://naltinbas.github.io/greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
+
+To light the builds up:
+
+1. Get a Unity license file. Easiest route is game-ci's activation flow: run their [unity-request-activation-file workflow](https://game.ci/docs/github/activation) (or `game-ci/unity-request-activation-file` locally), upload the `.alf` at license.unity3d.com, and you get a `.ulf` back. Personal licenses work fine.
+2. In the repo settings, add three Actions secrets: `UNITY_LICENSE` (the full contents of the `.ulf` file), `UNITY_EMAIL` and `UNITY_PASSWORD` (the Unity account it belongs to).
+3. Make sure Pages is set to deploy from GitHub Actions (Settings → Pages → Source → GitHub Actions). This repo already has that flipped via the API, so normally there's nothing to do here.
+
+Next push to main after that runs editmode tests inside the editor, builds all four platforms, and the Pages link goes live.
