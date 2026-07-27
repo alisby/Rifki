@@ -84,12 +84,23 @@ namespace King.Core
         // hearts contracts slots in here.
         List<Card> LeadCandidates(List<Card> hand) => new List<Card>(hand);
 
-        // Follow suit if able; a void may play anything. Contract-specific tightening —
-        // forced penalty dumps and must-trump-when-void — slots in here.
+        // Follow suit if able. A void must trump in a trump deal (with no obligation
+        // to beat trumps already on the table); otherwise a void may play anything.
+        // The forced penalty dumps of the card-penalty contracts slot in here.
         List<Card> FollowCandidates(List<Card> hand, Suit led)
         {
             var inSuit = hand.Where(c => c.Suit == led).ToList();
-            return inSuit.Count > 0 ? inSuit : new List<Card>(hand);
+            if (inSuit.Count > 0)
+                return inSuit;
+
+            if (Contract.TrumpSuit != null)
+            {
+                var trumps = hand.Where(c => c.Suit == Contract.TrumpSuit.Value).ToList();
+                if (trumps.Count > 0)
+                    return trumps;
+            }
+
+            return new List<Card>(hand);
         }
 
         public CompletedTrick Play(Card card)
@@ -138,8 +149,29 @@ namespace King.Core
         {
             if (!IsComplete)
                 throw new InvalidOperationException("the deal is still in progress");
-            // Per-contract scoring lands in a later branch.
-            throw new NotImplementedException("scoring is not implemented yet");
+
+            var units = CountUnits();
+            var points = new int[4];
+            int value = Contracts.UnitValue(Contract.Type);
+            for (int s = 0; s < 4; s++)
+                points[s] = units[s] * value;
+            return new DealScore(points, units);
+        }
+
+        // Scoring units captured per seat. In a trump deal every trick is a unit; the
+        // penalty contracts land here with their own branches.
+        int[] CountUnits()
+        {
+            var units = new int[4];
+            switch (Contract.Type)
+            {
+                case ContractType.Trump:
+                    foreach (var trick in history)
+                        units[(int)trick.Winner]++;
+                    return units;
+                default:
+                    throw new NotImplementedException("scoring for " + Contract.Type + " is not implemented yet");
+            }
         }
 
         static Seat Next(Seat seat) => (Seat)(((int)seat + 1) % 4);
@@ -154,11 +186,19 @@ namespace King.Core
             return best.Seat;
         }
 
-        // No trump yet, so only the led suit competes and best always holds a led-suit
-        // card. The trump branch extends this: a trump beats any non-trump, and among
-        // trumps the higher rank wins.
+        // A trump beats any non-trump, and among trumps the higher rank wins. With no
+        // trump involved, only the led suit competes.
         bool Beats(Card candidate, Card best, Suit led)
         {
+            if (Contract.TrumpSuit != null)
+            {
+                bool candidateTrumps = candidate.Suit == Contract.TrumpSuit.Value;
+                bool bestTrumps = best.Suit == Contract.TrumpSuit.Value;
+                if (candidateTrumps != bestTrumps)
+                    return candidateTrumps;
+                if (candidateTrumps)
+                    return candidate.Rank > best.Rank;
+            }
             return candidate.Suit == led && candidate.Rank > best.Rank;
         }
     }
