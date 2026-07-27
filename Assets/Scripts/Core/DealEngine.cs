@@ -207,29 +207,30 @@ namespace King.Core
             return new DealScore(points, units);
         }
 
-        // Scoring units captured per seat. In a trump deal every trick is a unit; in
-        // the card-penalty deals each captured penalty card charges its trick's
-        // winner. The remaining contracts land here with their own branches.
+        // Scoring units captured per seat. Trump and no-tricks count every trick for
+        // its winner, no-last-two only the final pair, and the card-penalty deals
+        // charge each captured penalty card to its trick's winner.
         int[] CountUnits()
         {
             var units = new int[4];
             switch (Contract.Type)
             {
                 case ContractType.Trump:
+                case ContractType.NoTricks:
                     foreach (var trick in history)
                         units[(int)trick.Winner]++;
                     return units;
-                case ContractType.NoHearts:
-                case ContractType.NoQueens:
-                case ContractType.NoMen:
-                case ContractType.KingOfHearts:
+                case ContractType.NoLastTwo:
+                    foreach (var trick in history)
+                        if (trick.Number >= 12)
+                            units[(int)trick.Winner]++;
+                    return units;
+                default:
                     foreach (var trick in history)
                         foreach (var play in trick.Plays)
                             if (IsPenaltyCard(play.Card))
                                 units[(int)trick.Winner]++;
                     return units;
-                default:
-                    throw new NotImplementedException("scoring for " + Contract.Type + " is not implemented yet");
             }
         }
 
