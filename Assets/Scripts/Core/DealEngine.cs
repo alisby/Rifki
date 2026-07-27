@@ -135,14 +135,18 @@ namespace King.Core
         }
 
         // Cards that cost their captor points under the current contract. Forced
-        // dumping and early termination both key off this; the queens, men, and
-        // king-of-hearts contracts add their cases with their branches.
+        // dumping and early termination both key off this. No tricks and no last
+        // two have no penalty cards at all, so neither rule touches them.
         bool IsPenaltyCard(Card card)
         {
             switch (Contract.Type)
             {
                 case ContractType.NoHearts:
                     return card.Suit == Suit.Hearts;
+                case ContractType.NoQueens:
+                    return card.Rank == Rank.Queen;
+                case ContractType.NoMen:
+                    return card.Rank == Rank.King || card.Rank == Rank.Jack;
                 case ContractType.KingOfHearts:
                     return card.Suit == Suit.Hearts && card.Rank == Rank.King;
                 default:
@@ -216,6 +220,8 @@ namespace King.Core
                         units[(int)trick.Winner]++;
                     return units;
                 case ContractType.NoHearts:
+                case ContractType.NoQueens:
+                case ContractType.NoMen:
                 case ContractType.KingOfHearts:
                     foreach (var trick in history)
                         foreach (var play in trick.Plays)
