@@ -143,6 +143,8 @@ namespace King.Core
             {
                 case ContractType.NoHearts:
                     return card.Suit == Suit.Hearts;
+                case ContractType.KingOfHearts:
+                    return card.Suit == Suit.Hearts && card.Rank == Rank.King;
                 default:
                     return false;
             }
@@ -214,6 +216,7 @@ namespace King.Core
                         units[(int)trick.Winner]++;
                     return units;
                 case ContractType.NoHearts:
+                case ContractType.KingOfHearts:
                     foreach (var trick in history)
                         foreach (var play in trick.Plays)
                             if (IsPenaltyCard(play.Card))
