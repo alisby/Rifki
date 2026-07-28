@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
 
+# Two pushes in a row would otherwise race each other on the Pages deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   # The merge gate. Pure C# engine tests, no Unity, no secrets, always runs.
   engine-tests:

@@ -8,7 +8,7 @@ King, the Turkish trick-taking game (Rıfkı, if you grew up with it), for one h
 
 ## The game
 
-King is a compendium game: twenty deals, and each one runs under a different contract. Six are penalty contracts where the goal is to *not* take things — tricks, hearts, queens, kings and jacks, the king of hearts, the last two tricks. The other eight are trump deals where tricks finally score in your favor. The right to call the contract rotates, so you spend part of the evening attacking and the rest dodging whatever your opponents picked to hurt you with.
+King is a compendium game: twenty deals, and the player whose turn it is to call decides what each one is played for. There are six penalty contracts, where the goal is to *not* take things — tricks, hearts, queens, kings and jacks, the king of hearts, the last two tricks. Each gets called twice over the night, which accounts for twelve deals. The other eight are trump deals, two per player, where tricks finally score in your favour. So you spend part of the evening attacking and the rest dodging whatever your opponents picked to hurt you with.
 
 Scores across a full session always sum to zero. Your win is, exactly, everyone else's loss.
 

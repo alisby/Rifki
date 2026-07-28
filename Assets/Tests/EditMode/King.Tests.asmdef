@@ -3,7 +3,9 @@
     "rootNamespace": "King.Tests",
     "references": [
         "King.Core",
-        "King.AI"
+        "King.AI",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

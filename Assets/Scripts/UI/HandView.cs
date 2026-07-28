@@ -41,6 +41,7 @@ namespace King.UI
                 slot.Face = new CardFace(row, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, CardSize);
                 slot.Button = UiKit.MakeButton(slot.Face.Body);
                 slot.Button.interactable = false;
+                slot.Face.SetVisible(false);   // nothing to show until the first deal
                 var captured = slot;
                 slot.Button.onClick.AddListener(() =>
                 {

@@ -7,7 +7,11 @@ PlayerSettings:
   productGUID: 8aa026b338a14a0396f12c63cde688eb
   companyName: greenbaize
   productName: King
-  defaultScreenOrientation: 4
+  defaultScreenOrientation: 3
+  allowedAutorotateToPortrait: 0
+  allowedAutorotateToPortraitUpsideDown: 0
+  allowedAutorotateToLandscapeRight: 1
+  allowedAutorotateToLandscapeLeft: 1
   accelerometerFrequency: 60
   m_ActiveColorSpace: 0
   bundleVersion: 0.1.0
