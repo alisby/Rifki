@@ -168,6 +168,8 @@ namespace King.UI
                     trickView.ShowCompleted(completed);
                     yield return new WaitForSeconds(TrickLinger);
                     trickView.Clear();
+                    // Clear() resets all four seat labels, so re-mark whoever leads next.
+                    trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
                 }
             }
         }
@@ -207,6 +209,9 @@ namespace King.UI
             {
                 if (legal == card)
                 {
+                    // Close the gate here, not when the coroutine wakes up next frame,
+                    // or a fast double click plays two cards.
+                    awaitingHuman = false;
                     humanChoice = card;
                     return;
                 }

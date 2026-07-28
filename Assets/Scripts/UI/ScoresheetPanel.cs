@@ -28,7 +28,7 @@ namespace King.UI
             toggle.onClick.AddListener(() => panel.SetActive(!panel.activeSelf));
 
             var panelRect = UiKit.Rect("Scoresheet", canvas, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 6f), new Vector2(920f, 850f));
+                new Vector2(0f, 62f), new Vector2(920f, 780f));
             var background = UiKit.RoundedImage(panelRect, new Color(0.04f, 0.12f, 0.07f, 0.97f));
             background.raycastTarget = true;   // cards under the sheet should not catch clicks
             panel = panelRect.gameObject;
