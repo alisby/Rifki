@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using King.AI;
 using King.Core;
@@ -100,10 +99,14 @@ namespace King.UI
             while (!session.IsComplete)
             {
                 var available = session.AvailableContracts();
-                // Hands are dealt inside StartDeal, so contract calls are made blind.
+                var hands = session.DealHands();
                 ContractCall call;
                 if (session.Caller == Seat.South)
                 {
+                    // Deal the cards face up first; picking a contract blind would be
+                    // a coin toss.
+                    handView.Show(hands[(int)Seat.South]);
+                    handView.DisableAll();
                     statusLine.Set($"Deal {session.DealNumber}/{Session.DealCount}   your call");
                     ContractCall? picked = null;
                     picker.Show(available, c => picked = c);
@@ -113,7 +116,8 @@ namespace King.UI
                 }
                 else
                 {
-                    call = bots[(int)session.Caller].ChooseContract(session, Array.Empty<Card>(), available);
+                    int caller = (int)session.Caller;
+                    call = bots[caller].ChooseContract(session, hands[caller], available);
                 }
                 deal = session.StartDeal(call);
                 yield return RunDeal();

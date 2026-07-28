@@ -25,6 +25,10 @@ namespace King.Core
 
         DealEngine pending;
 
+        // Cards for the deal about to be called. Held here because the caller has
+        // to see their hand before naming a contract.
+        IReadOnlyList<Card>[] dealtHands;
+
         // 1-based number of the next (or in-progress) deal.
         public int DealNumber { get; private set; } = 1;
 
@@ -69,6 +73,26 @@ namespace King.Core
             return trumpLeft[(int)s];
         }
 
+        // Deals the next hand without committing to a contract. Calling it twice
+        // before the deal starts hands back the same cards, so a player can study
+        // them, back out of the picker, and come back to the same thirteen.
+        public IReadOnlyList<Card>[] DealHands()
+        {
+            if (IsComplete)
+                throw new InvalidOperationException("the session is over");
+            if (pending != null)
+                throw new InvalidOperationException("a deal is already in progress");
+
+            if (dealtHands == null)
+            {
+                var dealt = Deck.Deal(rng);
+                dealtHands = new IReadOnlyList<Card>[4];
+                for (int i = 0; i < 4; i++)
+                    dealtHands[i] = Array.AsReadOnly(dealt[i]);
+            }
+            return (IReadOnlyList<Card>[])dealtHands.Clone();
+        }
+
         public DealEngine StartDeal(ContractCall call)
         {
             if (IsComplete)
@@ -93,11 +117,9 @@ namespace King.Core
                 penaltyLeft[(int)call.Type]--;
             }
 
-            var dealt = Deck.Deal(rng);
-            var hands = new IReadOnlyList<Card>[4];
-            for (int i = 0; i < 4; i++)
-                hands[i] = dealt[i];
-            pending = new DealEngine(call, hands, Caller);
+            // Quota checks run first so a rejected call never burns a shuffle.
+            pending = new DealEngine(call, DealHands(), Caller);
+            dealtHands = null;
             return pending;
         }
 
