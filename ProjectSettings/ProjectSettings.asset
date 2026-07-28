@@ -5,7 +5,7 @@ PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 27
   productGUID: 8aa026b338a14a0396f12c63cde688eb
-  companyName: Greenbaize
+  companyName: Rifki
   productName: King
   defaultScreenOrientation: 3
   allowedAutorotateToPortrait: 0
@@ -17,9 +17,9 @@ PlayerSettings:
   bundleVersion: 0.1.0
   AndroidBundleVersionCode: 1
   applicationIdentifier:
-    Android: com.greenbaize.king
-    Standalone: com.greenbaize.king
-    iPhone: com.greenbaize.king
+    Android: com.rifki.king
+    Standalone: com.rifki.king
+    iPhone: com.rifki.king
   buildNumber:
     Standalone: 0
     iPhone: 0

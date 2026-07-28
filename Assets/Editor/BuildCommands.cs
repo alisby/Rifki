@@ -29,13 +29,13 @@ namespace King.EditorTools
 
         public static void WebGL() => Run(BuildTarget.WebGL, "WebGL", "WebGL");
 
-        public static void LinuxDesktop() => Run(BuildTarget.StandaloneLinux64, "Linux", "Greenbaize.x86_64");
+        public static void LinuxDesktop() => Run(BuildTarget.StandaloneLinux64, "Linux", "Rifki.x86_64");
 
-        public static void MacDesktop() => Run(BuildTarget.StandaloneOSX, "macOS", "Greenbaize.app");
+        public static void MacDesktop() => Run(BuildTarget.StandaloneOSX, "macOS", "Rifki.app");
 
-        public static void WindowsDesktop() => Run(BuildTarget.StandaloneWindows64, "Windows", "Greenbaize.exe");
+        public static void WindowsDesktop() => Run(BuildTarget.StandaloneWindows64, "Windows", "Rifki.exe");
 
-        public static void Android() => Run(BuildTarget.Android, "Android", "Greenbaize.apk");
+        public static void Android() => Run(BuildTarget.Android, "Android", "Rifki.apk");
 
         // The table is built entirely from code, so no asset in the project ever
         // references the uGUI shaders. The build strips them and every player

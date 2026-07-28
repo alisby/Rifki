@@ -1,8 +1,8 @@
-<img align="left" width="140" src="logo.png" alt="Greenbaize logo">
+<img align="left" width="140" src="logo.png" alt="Rifki logo">
 
-# Greenbaize
+# Rifki
 
-King, the Turkish trick-taking game (Rıfkı, if you grew up with it), for one human and three machines. Built in Unity.
+The Turkish trick-taking game, for one human and three machines. Built in Unity. Rıfkı is what it gets called at the table; in English the game is King, which is the name the code uses throughout.
 
 <br clear="left">
 
@@ -75,7 +75,7 @@ Scores go on a twenty-row sheet with a running total. Deal one here was no men: 
 
 Every push to main and every pull request runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs no setup at all, and everything else hangs off it: if the rules engine is broken, nothing gets built and nothing gets deployed.
 
-The rest of the pipeline builds the actual game. WebGL, macOS, Windows and Android each come out as a downloadable artifact, and the WebGL build goes up to GitHub Pages at https://naltinbas.github.io/Greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
+The rest of the pipeline builds the actual game. WebGL, macOS, Windows and Android each come out as a downloadable artifact, and the WebGL build goes up to GitHub Pages at https://naltinbas.github.io/Rifki/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
 
 That link is dark at the moment. Pages is configured and waiting, but nothing has deployed to it yet, so don't expect the demo to load until a build with a license actually runs.
 
