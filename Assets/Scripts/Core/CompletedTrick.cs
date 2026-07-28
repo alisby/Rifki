@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace King.Core
@@ -18,7 +19,7 @@ namespace King.Core
             Number = number;
             Leader = leader;
             Winner = winner;
-            Plays = plays;
+            Plays = Array.AsReadOnly(plays);
         }
     }
 }

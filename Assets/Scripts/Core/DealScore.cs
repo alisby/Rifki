@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace King.Core
@@ -12,8 +13,8 @@ namespace King.Core
 
         internal DealScore(int[] points, int[] unitsTaken)
         {
-            Points = points;
-            UnitsTaken = unitsTaken;
+            Points = Array.AsReadOnly(points);
+            UnitsTaken = Array.AsReadOnly(unitsTaken);
         }
     }
 }

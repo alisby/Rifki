@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace King.Core
@@ -16,7 +17,7 @@ namespace King.Core
             DealNumber = dealNumber;
             Caller = caller;
             Contract = contract;
-            Points = points;
+            Points = Array.AsReadOnly(points);
         }
     }
 }
