@@ -1,6 +1,6 @@
-<img align="left" width="140" src="logo.png" alt="greenbaize logo">
+<img align="left" width="140" src="logo.png" alt="Greenbaize logo">
 
-# greenbaize
+# Greenbaize
 
 King, the Turkish trick-taking game (Rıfkı, if you grew up with it), for one human and three machines. Built in Unity.
 
@@ -44,7 +44,7 @@ Handy when you want to check a rules change without waiting for the editor.
 
 Every push and PR runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs zero setup and is the merge gate: if the rules engine is broken, nothing lands.
 
-The rest of the pipeline builds the actual game — WebGL, macOS, Windows and Android, each uploaded as a downloadable artifact — and pushes the WebGL build to GitHub Pages, so the latest main is always playable at https://naltinbas.github.io/greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
+The rest of the pipeline builds the actual game — WebGL, macOS, Windows and Android, each uploaded as a downloadable artifact — and pushes the WebGL build to GitHub Pages, so the latest main is always playable at https://naltinbas.github.io/Greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
 
 To light the builds up:
 
