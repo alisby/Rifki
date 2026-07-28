@@ -23,6 +23,7 @@ Assets/
     AI/      the three computer seats. Also plain C#.
     UI/      table, hand display, trick area, scoreboard, contract picker.
   Scenes/
+  Editor/    batchmode build entry points
   Tests/     edit-mode tests for the engine
 dev/         thin dotnet harness so engine tests run without the editor
 docs/        rules writeup
@@ -42,9 +43,9 @@ Handy when you want to check a rules change without waiting for the editor.
 
 ## CI and builds
 
-Every push and PR runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs zero setup and is the merge gate: if the rules engine is broken, nothing lands.
+Every push to main and every pull request runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs no setup at all, and everything else hangs off it: if the rules engine is broken, nothing gets built and nothing gets deployed.
 
-The rest of the pipeline builds the actual game — WebGL, macOS, Windows and Android, each uploaded as a downloadable artifact — and pushes the WebGL build to GitHub Pages, so the latest main is always playable at https://naltinbas.github.io/Greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
+The rest of the pipeline builds the actual game. WebGL, macOS, Windows and Android each come out as a downloadable artifact, and the WebGL build goes up to GitHub Pages, so the latest main is always playable at https://naltinbas.github.io/Greenbaize/. Those jobs need a Unity license, so they check for the license secrets first and quietly skip when they're missing. Nothing fails, the tests still run, you just don't get builds.
 
 To light the builds up:
 
