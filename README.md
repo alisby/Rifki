@@ -1,5 +1,5 @@
-# Rifki
 <img align="left" width="140" src="logo.png" alt="Rifki logo">
+# Rifki
 The Turkish trick-taking game, for one human and three machines. Built in Unity. Rıfkı is what it gets called at the table; in English the game is King, which is the name the code uses throughout.
 
 <br clear="left">
