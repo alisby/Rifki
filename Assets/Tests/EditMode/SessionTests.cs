@@ -200,5 +200,63 @@ namespace King.Tests
             for (int s = 0; s < 4; s++)
                 Assert.AreEqual(session.Sheet.Sum(r => r.Points[s]), session.Totals[s]);
         }
+
+        [Test]
+        public void HandsAreDealtBeforeAnyoneHasToNameAContract()
+        {
+            var session = new Session(7);
+            var hands = session.DealHands();
+
+            Assert.AreEqual(4, hands.Length);
+            foreach (var hand in hands)
+                Assert.AreEqual(13, hand.Count);
+            CollectionAssert.AllItemsAreUnique(hands.SelectMany(h => h).ToArray());
+        }
+
+        [Test]
+        public void LookingAtTheHandTwiceShowsTheSameCards()
+        {
+            var session = new Session(7);
+            var first = session.DealHands();
+            var second = session.DealHands();
+
+            for (int s = 0; s < 4; s++)
+                CollectionAssert.AreEqual(first[s].ToArray(), second[s].ToArray());
+
+            // And the deal that follows is played with those very cards.
+            var deal = session.StartDeal(new ContractCall(ContractType.NoTricks));
+            for (int s = 0; s < 4; s++)
+                CollectionAssert.AreEqual(first[s].ToArray(), deal.HandOf((Seat)s).ToArray());
+        }
+
+        [Test]
+        public void PeekingAtTheHandDoesNotChangeWhatGetsDealt()
+        {
+            var quiet = new Session(23);
+            var peeked = new Session(23);
+            peeked.DealHands();
+
+            var a = quiet.StartDeal(new ContractCall(ContractType.NoTricks));
+            var b = peeked.StartDeal(new ContractCall(ContractType.NoTricks));
+            for (int s = 0; s < 4; s++)
+                CollectionAssert.AreEqual(a.HandOf((Seat)s).ToArray(), b.HandOf((Seat)s).ToArray());
+        }
+
+        [Test]
+        public void ARejectedCallLeavesTheHandUntouched()
+        {
+            var session = new Session(3);
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+
+            // Both no-tricks calls are spent, so North asking for a third is refused.
+            var hands = session.DealHands();
+            Assert.Throws<InvalidOperationException>(
+                () => session.StartDeal(new ContractCall(ContractType.NoTricks)));
+
+            var again = session.DealHands();
+            for (int s = 0; s < 4; s++)
+                CollectionAssert.AreEqual(hands[s].ToArray(), again[s].ToArray());
+        }
     }
 }
