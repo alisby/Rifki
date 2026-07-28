@@ -41,6 +41,36 @@ cd dev && dotnet test
 
 Handy when you want to check a rules change without waiting for the editor.
 
+There's also `dev/uicheck.sh`, which compiles the UI and editor scripts against a real Unity install without opening the editor. `dotnet test` only covers Core and AI, so nothing else catches a mistyped UnityEngine call until a full build:
+
+```
+UNITY=/path/to/Unity-6000.0.80f1 dev/uicheck.sh
+```
+
+Building from the command line, one method per platform:
+
+```
+Unity -batchmode -quit -nographics -projectPath . \
+      -buildTarget Linux64 \
+      -executeMethod King.EditorTools.BuildCommands.LinuxDesktop
+```
+
+Swap in `WebGL`, `MacDesktop`, `WindowsDesktop` or `Android` for the other targets. Builds land in `build/<platform>/`. One warning from experience: import the project once on its own before asking for a build, because a cold project resolves its packages and compiles the player in the same pass and the assembly references come out wrong.
+
+## Gameplay
+
+Mid-deal, in the desktop build. West called spades as trump, South led a club and is out of trumps so the jack is just a discard, and North is on the clock:
+
+![a trick in progress](screenshots/desktop-trick.png)
+
+The caller picks the contract with their cards already on the table, since choosing blind would be a coin toss. Whatever is out of quota is greyed out:
+
+![choosing a contract](screenshots/desktop-contract.png)
+
+Scores go on a twenty-row sheet with a running total. Deal one here was no men: South collected six of the eight kings and jacks, North picked up two, and the row sums to -480 like it has to:
+
+![the scoresheet](screenshots/desktop-scoresheet.png)
+
 ## CI and builds
 
 Every push to main and every pull request runs the engine tests on a plain ubuntu runner with dotnet 8. That job needs no setup at all, and everything else hangs off it: if the rules engine is broken, nothing gets built and nothing gets deployed.

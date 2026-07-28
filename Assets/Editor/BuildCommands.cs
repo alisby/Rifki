@@ -37,8 +37,51 @@ namespace King.EditorTools
 
         public static void Android() => Run(BuildTarget.Android, "Android", "Greenbaize.apk");
 
+        // The table is built entirely from code, so no asset in the project ever
+        // references the uGUI shaders. The build strips them and every player
+        // comes out solid magenta while the editor looks fine. Pin them.
+        static void EnsureUiShaders()
+        {
+            var wanted = new[] { "UI/Default", "UI/Default Font", "Sprites/Default" };
+            var settings = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset");
+            if (settings.Length == 0)
+                throw new Exception("could not open GraphicsSettings.asset");
+
+            var so = new SerializedObject(settings[0]);
+            var list = so.FindProperty("m_AlwaysIncludedShaders");
+            bool changed = false;
+
+            foreach (var name in wanted)
+            {
+                var shader = Shader.Find(name);
+                if (shader == null)
+                {
+                    Debug.LogWarning("no shader called " + name + "; skipping");
+                    continue;
+                }
+
+                bool present = false;
+                for (int i = 0; i < list.arraySize; i++)
+                    if (list.GetArrayElementAtIndex(i).objectReferenceValue == shader)
+                        present = true;
+                if (present) continue;
+
+                list.InsertArrayElementAtIndex(list.arraySize);
+                list.GetArrayElementAtIndex(list.arraySize - 1).objectReferenceValue = shader;
+                changed = true;
+                Debug.Log("added " + name + " to the always-included shaders");
+            }
+
+            if (changed)
+            {
+                so.ApplyModifiedProperties();
+                AssetDatabase.SaveAssets();
+            }
+        }
+
         static void Run(BuildTarget target, string folder, string artifact)
         {
+            EnsureUiShaders();
             var group = BuildPipeline.GetBuildTargetGroup(target);
             if (!BuildPipeline.IsBuildTargetSupported(group, target))
                 throw new Exception(target + " support is not installed in this editor");
