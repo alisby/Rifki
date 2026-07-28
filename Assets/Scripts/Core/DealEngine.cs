@@ -19,7 +19,8 @@ namespace King.Core
         public Seat ToPlay { get; private set; }
         public bool IsComplete { get; private set; }
 
-        // 1-based number of the trick in progress; stays at 13 once the deal is done.
+        // 1-based number of the trick in progress. Once the deal is done it stays
+        // on the last trick played, which is short of 13 when the deal ended early.
         public int TrickNumber { get; private set; }
 
         // Only meaningful in the hearts contracts, but tracked unconditionally.
@@ -137,6 +138,10 @@ namespace King.Core
         // Cards that cost their captor points under the current contract. Forced
         // dumping and early termination both key off this. No tricks and no last
         // two have no penalty cards at all, so neither rule touches them.
+        internal static bool IsCardPenalty(ContractType type) =>
+            type == ContractType.NoHearts || type == ContractType.NoQueens
+            || type == ContractType.NoMen || type == ContractType.KingOfHearts;
+
         bool IsPenaltyCard(Card card)
         {
             switch (Contract.Type)
@@ -163,8 +168,10 @@ namespace King.Core
 
             hands[(int)ToPlay].Remove(card);
 
-            // "Broken" means a heart went down on a trick led in another suit.
-            if (card.Suit == Suit.Hearts && currentTrick.Count > 0 && currentTrick[0].Card.Suit != Suit.Hearts)
+            // Any heart on the table breaks them. Usually that's a discard on
+            // another suit's lead, but a player down to nothing but hearts has to
+            // lead one, and it would be daft to keep the suit shut after that.
+            if (card.Suit == Suit.Hearts)
                 HeartsBroken = true;
 
             currentTrick.Add((ToPlay, card));
@@ -235,10 +242,13 @@ namespace King.Core
         }
 
         // A card-penalty deal stops early once every card that can still score has
-        // been captured. The other contracts hold no penalty cards, so their count
-        // never reaches the target and they always play out all thirteen tricks.
+        // been captured. No tricks and no last two are scored by trick, not by
+        // card, so they always play out all thirteen.
         bool NothingLeftCanScore()
         {
+            if (!IsCardPenalty(Contract.Type))
+                return false;
+
             int captured = 0;
             foreach (var trick in history)
                 foreach (var play in trick.Plays)

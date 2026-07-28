@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using King.Core;
 using NUnit.Framework;
@@ -199,6 +200,18 @@ namespace King.Tests
                 Assert.AreEqual(i + 1, session.Sheet[i].DealNumber);
             for (int s = 0; s < 4; s++)
                 Assert.AreEqual(session.Sheet.Sum(r => r.Points[s]), session.Totals[s]);
+        }
+
+        [Test]
+        public void TheScoreSheetCannotBeEditedThroughItsOwnAccessors()
+        {
+            var session = new Session(5);
+            RunDeal(session, new ContractCall(ContractType.NoQueens));
+            var row = session.Sheet[0];
+
+            Assert.Throws<NotSupportedException>(() => ((IList<int>)row.Points)[0] = 999);
+            Assert.Throws<NotSupportedException>(() => ((IList<int>)session.Totals)[0] = 999);
+            Assert.AreEqual(-400, row.Points.Sum());
         }
 
         [Test]

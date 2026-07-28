@@ -41,7 +41,7 @@ Penalty deals have no trump, so the highest card of the led suit takes the trick
 
 Hearts restrictions, in the No hearts and King of hearts deals only:
 
-- You may not lead a heart until a heart has been discarded on an earlier trick ("broken"), unless hearts are all you have left.
+- You may not lead a heart until one has been played on an earlier trick ("broken"), unless hearts are all you have left. Normally that first heart is a discard by someone void in the led suit, but a player holding nothing but hearts has to lead one, and that counts too.
 
 Forced dumping, in the four card-penalty deals (No hearts, No queens, No men, King of hearts):
 

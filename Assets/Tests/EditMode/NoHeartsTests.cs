@@ -90,6 +90,16 @@ namespace King.Tests
         }
 
         [Test]
+        public void AForcedHeartLeadBreaksHeartsForEveryoneElse()
+        {
+            // North holds nothing but hearts, so the lead restriction has to let
+            // one through. Once it's on the table the suit is open.
+            var deal = NewDeal(SuitPerSeat(), Seat.North);
+            deal.Play(C(Suit.Hearts, Rank.Two));
+            Assert.IsTrue(deal.HeartsBroken);
+        }
+
+        [Test]
         public void VoidInLedSuitMustDumpAHeartIfHeld()
         {
             var deal = NewDeal(SplitHearts(), Seat.South);
