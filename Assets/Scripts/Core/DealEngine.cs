@@ -136,9 +136,9 @@ namespace King.Core
         }
 
         // Cards that cost their captor points under the current contract. Forced
-        // dumping and early termination both key off this. No tricks and no last
-        // two have no penalty cards at all, so neither rule touches them.
-        internal static bool IsCardPenalty(ContractType type) =>
+        // dumping and early termination both key off this. Trump, no tricks and
+        // no last two hold no penalty cards, so neither rule touches them.
+        internal static bool ScoresByCard(ContractType type) =>
             type == ContractType.NoHearts || type == ContractType.NoQueens
             || type == ContractType.NoMen || type == ContractType.KingOfHearts;
 
@@ -241,12 +241,12 @@ namespace King.Core
             }
         }
 
-        // A card-penalty deal stops early once every card that can still score has
-        // been captured. No tricks and no last two are scored by trick, not by
-        // card, so they always play out all thirteen.
+        // A card-penalty deal stops early once every card that can still score
+        // has been captured. Trump, no tricks and no last two are scored by the
+        // trick rather than the card, so they always play out all thirteen.
         bool NothingLeftCanScore()
         {
-            if (!IsCardPenalty(Contract.Type))
+            if (!ScoresByCard(Contract.Type))
                 return false;
 
             int captured = 0;

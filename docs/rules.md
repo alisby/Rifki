@@ -45,7 +45,7 @@ Hearts restrictions, in the No hearts and King of hearts deals only:
 
 Forced dumping, in the four card-penalty deals (No hearts, No queens, No men, King of hearts):
 
-- Void in the led suit? You must discard a penalty card of the current deal if you hold one. A heart, a queen, a king or jack, or the K of hearts, respectively.
+- If you're void in the led suit, you must discard a penalty card of the current deal if you hold one. A heart, a queen, a king or jack, or the K of hearts, respectively.
 - Following suit while the trick already contains a higher card of that suit than a penalty card you hold in it? You must play that penalty card. Classic example: hearts led, the ace is already down, you hold the king of hearts in the King of hearts deal. It goes.
 
 Neither rule applies in No tricks or No last two. There you just follow suit.

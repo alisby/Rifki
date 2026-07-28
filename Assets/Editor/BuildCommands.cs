@@ -10,6 +10,11 @@ namespace King.EditorTools
     // Batchmode entry points, driven from the command line:
     //   unity -quit -batchmode -nographics -projectPath . -executeMethod King.EditorTools.BuildCommands.WebGL
     // Output lands in build/<platform>/ next to the project.
+    //
+    // This is the local path. The Actions workflow leaves buildMethod unset and
+    // lets unity-builder use its own build script, which writes to different
+    // folder names - so if you ever point CI at these methods, fix the paths the
+    // Pages upload step reads.
     public static class BuildCommands
     {
         const string OutputRoot = "build";

@@ -10,8 +10,8 @@ namespace King.AI
     // cheapest (or trump when a long strong suit can carry the deal), and card
     // play is plain table sense — duck and shed danger in the penalty deals,
     // draw trumps and win cheaply in the trump ones. All weights are constants
-    // and ties break through the seeded rng, so a given seed always produces
-    // the same decisions.
+    // and the one rng tie-break it does use is seeded, so a given seed always
+    // produces the same decisions.
     public sealed class HeuristicAgent : IPlayerAgent
     {
         // A trump deal pays +650 while penalty costs here are small integers,
