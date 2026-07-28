@@ -4,6 +4,7 @@ using King.AI;
 using King.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace King.UI
@@ -19,9 +20,6 @@ namespace King.UI
         // West, North and East. The South entry stays null; that seat plays by clicks.
         readonly IPlayerAgent[] bots = new IPlayerAgent[4];
 
-        // Stand-in that makes South's call until the contract picker UI exists.
-        IPlayerAgent southCaller;
-
         Session session;
         DealEngine deal;
 
@@ -29,6 +27,10 @@ namespace King.UI
         TrickView trickView;
         OpponentsView opponentsView;
         StatusLine statusLine;
+        ScoresheetPanel scoresheet;
+        NoticeBanner banner;
+        ContractPicker picker;
+        SessionOverScreen sessionOver;
 
         bool awaitingHuman;
         Card? humanChoice;
@@ -43,6 +45,12 @@ namespace King.UI
             opponentsView = new OpponentsView(canvas);
             handView = new HandView(canvas, OnCardClicked);
             statusLine = new StatusLine(canvas);
+            // Creation order is draw order: the sheet sits over the table, notices
+            // over the sheet, and the two modals over everything.
+            scoresheet = new ScoresheetPanel(canvas);
+            banner = new NoticeBanner(canvas);
+            picker = new ContractPicker(canvas);
+            sessionOver = new SessionOverScreen(canvas, Restart);
         }
 
         void Start()
@@ -50,8 +58,8 @@ namespace King.UI
             int seed = Environment.TickCount;
             for (int s = 1; s < 4; s++)
                 bots[s] = new HeuristicAgent(seed + s);
-            southCaller = new HeuristicAgent(seed + 4);
             session = new Session(seed);
+            scoresheet.Refresh(session);
             StartCoroutine(RunSession());
         }
 
@@ -93,21 +101,34 @@ namespace King.UI
             {
                 var available = session.AvailableContracts();
                 // Hands are dealt inside StartDeal, so contract calls are made blind.
-                var caller = session.Caller;
-                var call = caller == Seat.South
-                    ? southCaller.ChooseContract(session, Array.Empty<Card>(), available)
-                    : bots[(int)caller].ChooseContract(session, Array.Empty<Card>(), available);
+                ContractCall call;
+                if (session.Caller == Seat.South)
+                {
+                    statusLine.Set($"Deal {session.DealNumber}/{Session.DealCount}   your call");
+                    ContractCall? picked = null;
+                    picker.Show(available, c => picked = c);
+                    while (!picked.HasValue)
+                        yield return null;
+                    call = picked.Value;
+                }
+                else
+                {
+                    call = bots[(int)session.Caller].ChooseContract(session, Array.Empty<Card>(), available);
+                }
                 deal = session.StartDeal(call);
                 yield return RunDeal();
                 session.FinishDeal();
+                scoresheet.Refresh(session);
                 deal = null;
             }
-            var t = session.Totals;
-            statusLine.Set($"Session over   South {t[0]}   West {t[1]}   North {t[2]}   East {t[3]}");
+            statusLine.Set("Session over");
+            sessionOver.Show(session.Totals);
         }
 
         IEnumerator RunDeal()
         {
+            bool heartsMatter = deal.Contract.Type == ContractType.NoHearts
+                || deal.Contract.Type == ContractType.KingOfHearts;
             trickView.Clear();
             RefreshTable();
             while (!deal.IsComplete)
@@ -129,8 +150,13 @@ namespace King.UI
                     yield return new WaitForSeconds(BotDelay);
                     chosen = bots[(int)deal.ToPlay].ChooseCard(deal, deal.ToPlay);
                 }
+                bool wasBroken = deal.HeartsBroken;
                 var completed = deal.Play(chosen);
                 RefreshTable();
+                if (heartsMatter && !wasBroken && deal.HeartsBroken)
+                    banner.Flash(this, "Hearts are broken", 2f);
+                if (deal.IsComplete && deal.History.Count < 13)
+                    banner.Flash(this, "Nothing left to score — the deal ends early", 2.5f);
                 if (completed != null)
                 {
                     // The engine has already swept the trick into history, so put it
@@ -157,6 +183,13 @@ namespace King.UI
                 : deal.ToPlay == Seat.South ? "your turn"
                 : GameText.SeatLabel(deal.ToPlay) + " to play";
             return $"Deal {session.DealNumber}/{Session.DealCount}   {GameText.SeatLabel(session.Caller)} called {GameText.ContractLabel(deal.Contract)}   {turn}";
+        }
+
+        void Restart()
+        {
+            // The whole table is rebuilt from code, so a fresh session is just a
+            // scene reload.
+            SceneManager.LoadScene(gameObject.scene.buildIndex);
         }
 
         void OnCardClicked(Card card)
