@@ -8,7 +8,7 @@ The Turkish trick-taking card game, built in Unity.
 
 ## The game
 
-You take the South seat and the other three play themselves. Rıfkı is what the game gets called at the table; King is the English name, and the one the code uses throughout. Either way it's a compendium game: twenty deals, and the player whose turn it is to call decides what each one is played for. There are six penalty contracts, where the goal is to *not* take things — tricks, hearts, queens, kings and jacks, the king of hearts, the last two tricks. Each gets called twice over the night, which accounts for twelve deals. The other eight are trump deals, two per player, where tricks finally score in your favour. So you spend part of the evening attacking and the rest dodging whatever your opponents picked to hurt you with.
+You take the South seat and the other three play themselves. Rıfkı is what the game gets called at the table; King is the English name, and the one the code uses throughout. Either way it's a compendium game: twenty deals, and the player whose turn it is to call decides what each one is played for. There are six penalty contracts, where the goal is to *not* take things: tricks, hearts, queens, kings and jacks, the king of hearts, the last two tricks. Each gets called twice over the night, which accounts for twelve deals. The other eight are trump deals, two per player, where tricks finally score in your favour. So you spend part of the evening attacking and the rest dodging whatever your opponents picked to hurt you with.
 
 Scores across a full session always sum to zero. Your win is, exactly, everyone else's loss.
 
