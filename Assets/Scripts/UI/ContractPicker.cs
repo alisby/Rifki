@@ -39,7 +39,7 @@ namespace King.UI
         {
             var page = UiKit.Rect("Contracts", panel, Half, Half, Vector2.zero, panel.sizeDelta);
             UiKit.Label("Title", page, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -26f),
-                new Vector2(420f, 40f), "Your call", 34, CardStyle.Cream, TextAnchor.MiddleCenter);
+                new Vector2(420f, 40f), "Kontratı seçin", 34, CardStyle.Cream, TextAnchor.MiddleCenter);
 
             for (int i = 0; i < 7; i++)
             {
@@ -67,7 +67,7 @@ namespace King.UI
         {
             var page = UiKit.Rect("TrumpSuit", panel, Half, Half, Vector2.zero, panel.sizeDelta);
             UiKit.Label("Title", page, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -26f),
-                new Vector2(420f, 40f), "Pick the trump suit", 34, CardStyle.Cream, TextAnchor.MiddleCenter);
+                new Vector2(420f, 40f), "Koz rengini seçin", 34, CardStyle.Cream, TextAnchor.MiddleCenter);
 
             for (int i = 0; i < 4; i++)
             {
@@ -77,7 +77,7 @@ namespace King.UI
                 button.onClick.AddListener(() => Choose(new ContractCall(ContractType.Trump, suit)));
             }
 
-            var back = MenuButton(page, Half, new Vector2(0f, -120f), new Vector2(200f, 54f), "Back", 26, CardStyle.BlackInk);
+            var back = MenuButton(page, Half, new Vector2(0f, -120f), new Vector2(200f, 54f), "Geri", 26, CardStyle.BlackInk);
             back.onClick.AddListener(() =>
             {
                 suitPage.SetActive(false);

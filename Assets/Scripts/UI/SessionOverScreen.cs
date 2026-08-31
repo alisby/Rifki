@@ -25,7 +25,7 @@ namespace King.UI
             UiKit.RoundedImage(panel, new Color(0.07f, 0.19f, 0.11f, 0.98f));
 
             UiKit.Label("Title", panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -28f),
-                new Vector2(460f, 44f), "Session over", 38, CardStyle.Cream, TextAnchor.MiddleCenter);
+                new Vector2(460f, 44f), "Oyun bitti", 38, CardStyle.Cream, TextAnchor.MiddleCenter);
             winnerLine = UiKit.Label("Winner", panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -86f),
                 new Vector2(460f, 38f), "", 30, CardStyle.Gold, TextAnchor.MiddleCenter);
 
@@ -37,7 +37,7 @@ namespace King.UI
                 new Vector2(0f, 36f), new Vector2(230f, 60f));
             var buttonImage = UiKit.RoundedImage(buttonRect, CardStyle.Cream);
             var button = UiKit.MakeButton(buttonImage);
-            UiKit.Fill("Label", buttonRect, "Play again", 28, CardStyle.BlackInk, TextAnchor.MiddleCenter);
+            UiKit.Fill("Label", buttonRect, "Tekrar oyna", 28, CardStyle.BlackInk, TextAnchor.MiddleCenter);
             button.onClick.AddListener(() => onRestart());
 
             overlay.SetActive(false);
@@ -54,7 +54,7 @@ namespace King.UI
                 return byTotal != 0 ? byTotal : a.CompareTo(b);
             });
 
-            winnerLine.text = GameText.SeatLabel((Seat)order[0]) + " wins";
+            winnerLine.text = GameText.SeatLabel((Seat)order[0]) + " kazandı";
             for (int i = 0; i < 4; i++)
             {
                 int seat = order[i];

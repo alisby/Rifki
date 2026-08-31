@@ -32,7 +32,7 @@ namespace King.UI
                 if (!triedRounded)
                 {
                     triedRounded = true;
-                    rounded = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+                    rounded = null; // Unity 6: legacy UISprite unavailable
                 }
                 return rounded;
             }
@@ -72,7 +72,7 @@ namespace King.UI
         {
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = Rounded;
-            image.type = Image.Type.Sliced;
+            image.type = image.sprite != null ? Image.Type.Sliced : Image.Type.Simple;
             image.color = color;
             image.raycastTarget = false;
             return image;

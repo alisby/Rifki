@@ -26,8 +26,6 @@ namespace King.UI
                 Vector2.zero, BackSize);
             UiKit.RoundedImage(backRect, CardStyle.BackBlue);
             counts[(int)seat] = UiKit.Fill("Count", backRect, "13", 40, CardStyle.Cream, TextAnchor.MiddleCenter);
-            UiKit.Label("Name", panel, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero,
-                new Vector2(140f, 30f), GameText.SeatLabel(seat), 24, CardStyle.Cream, TextAnchor.MiddleCenter);
         }
 
         public void Refresh(DealEngine deal)

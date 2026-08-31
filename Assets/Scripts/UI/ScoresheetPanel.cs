@@ -12,8 +12,8 @@ namespace King.UI
     {
         const int Rows = Session.DealCount;
 
-        static readonly float[] ColumnX = { 34f, 108f, 226f, 424f, 544f, 664f, 784f };
-        static readonly float[] ColumnWidth = { 66f, 110f, 190f, 112f, 112f, 112f, 112f };
+        static readonly float[] ColumnX = { 32f, 108f, 252f, 492f, 612f, 732f, 852f };
+        static readonly float[] ColumnWidth = { 68f, 136f, 224f, 108f, 108f, 108f, 108f };
 
         readonly GameObject panel;
         readonly Text[,] cells = new Text[Rows + 1, 7];   // last row is the running totals
@@ -24,33 +24,49 @@ namespace King.UI
                 new Vector2(-24f, -14f), new Vector2(150f, 48f));
             var toggleImage = UiKit.RoundedImage(toggleRect, new Color(0.05f, 0.14f, 0.08f, 0.92f));
             var toggle = UiKit.MakeButton(toggleImage);
-            UiKit.Fill("Label", toggleRect, "Scores", 26, CardStyle.Cream, TextAnchor.MiddleCenter);
+            UiKit.Fill("Label", toggleRect, "Puanlar", 26, CardStyle.Cream, TextAnchor.MiddleCenter);
             toggle.onClick.AddListener(() => panel.SetActive(!panel.activeSelf));
 
             var panelRect = UiKit.Rect("Scoresheet", canvas, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 62f), new Vector2(920f, 780f));
+                new Vector2(0f, 65f), new Vector2(1000f, 560f));
             var background = UiKit.RoundedImage(panelRect, new Color(0.04f, 0.12f, 0.07f, 0.97f));
             background.raycastTarget = true;   // cards under the sheet should not catch clicks
             panel = panelRect.gameObject;
 
-            string[] headers = { "Deal", "Caller", "Contract", "South", "West", "North", "East" };
+            string[] headers =
+            {
+                "El",
+                "Söyleyen",
+                "Kontrat",
+                GameText.SeatLabel(Seat.South),
+                GameText.SeatLabel(Seat.West),
+                GameText.SeatLabel(Seat.North),
+                GameText.SeatLabel(Seat.East)
+            };
             for (int c = 0; c < 7; c++)
             {
                 var header = Cell(panelRect, c, 26f, headers[c]);
                 header.fontStyle = FontStyle.Bold;
                 header.color = CardStyle.Gold;
+
+                if (c >= 3)
+                {
+                    header.resizeTextForBestFit = true;
+                    header.resizeTextMinSize = 14;
+                    header.resizeTextMaxSize = 20;
+                }
             }
 
             for (int r = 0; r <= Rows; r++)
             {
-                float y = r < Rows ? 66f + r * 34f : 66f + Rows * 34f + 14f;
+                float y = r < Rows ? 54f + r * 23f : 54f + Rows * 23f + 10f;
                 for (int c = 0; c < 7; c++)
                     cells[r, c] = Cell(panelRect, c, y, "");
                 if (r == Rows)
                     for (int c = 0; c < 7; c++)
                         cells[r, c].fontStyle = FontStyle.Bold;
             }
-            cells[Rows, 2].text = "Running total";
+            cells[Rows, 2].text = "Toplam";
 
             panel.SetActive(false);
         }
@@ -59,8 +75,8 @@ namespace King.UI
         {
             var alignment = column < 3 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight;
             return UiKit.Label("Cell", parent, new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(ColumnX[column], -y), new Vector2(ColumnWidth[column], 30f),
-                text, 22, CardStyle.Cream, alignment);
+                new Vector2(ColumnX[column], -y), new Vector2(ColumnWidth[column], 24f),
+                text, 20, CardStyle.Cream, alignment);
         }
 
         public void Refresh(Session session)

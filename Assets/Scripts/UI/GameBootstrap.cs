@@ -32,6 +32,9 @@ namespace King.UI
         ContractPicker picker;
         SessionOverScreen sessionOver;
 
+        Transform canvas;
+        PlayerNameScreen playerNameScreen;
+
         bool awaitingHuman;
         Card? humanChoice;
 
@@ -39,25 +42,41 @@ namespace King.UI
         {
             BuildCamera();
             BuildEventSystem();
-            var canvas = BuildCanvas();
+            canvas = BuildCanvas();
             UiKit.Stretched("Felt", canvas, CardStyle.Felt);
-            trickView = new TrickView(canvas);
-            opponentsView = new OpponentsView(canvas);
-            handView = new HandView(canvas, OnCardClicked);
-            statusLine = new StatusLine(canvas);
-            // Creation order is draw order: the sheet sits over the table, notices
-            // over the sheet, and the two modals over everything.
-            scoresheet = new ScoresheetPanel(canvas);
-            banner = new NoticeBanner(canvas);
-            picker = new ContractPicker(canvas);
-            sessionOver = new SessionOverScreen(canvas, Restart);
         }
 
         void Start()
         {
+            playerNameScreen = new PlayerNameScreen(canvas, BeginGame);
+        }
+
+        void BeginGame(string south, string west, string north, string east)
+        {
+            GameText.SetSeatNames(south, west, north, east);
+
+            PlayerNameScreen.SaveNames(
+                GameText.SeatLabel(Seat.South),
+                GameText.SeatLabel(Seat.West),
+                GameText.SeatLabel(Seat.North),
+                GameText.SeatLabel(Seat.East));
+
+            trickView = new TrickView(canvas);
+            opponentsView = new OpponentsView(canvas);
+            handView = new HandView(canvas, OnCardClicked);
+            statusLine = new StatusLine(canvas);
+
+            // Creation order is draw order: the sheet sits over the table,
+            // notices over the sheet, and the modals over everything.
+            scoresheet = new ScoresheetPanel(canvas);
+            banner = new NoticeBanner(canvas);
+            picker = new ContractPicker(canvas);
+            sessionOver = new SessionOverScreen(canvas, Restart);
+
             int seed = Environment.TickCount;
             for (int s = 1; s < 4; s++)
                 bots[s] = new HeuristicAgent(seed + s);
+
             session = new Session(seed);
             scoresheet.Refresh(session);
             StartCoroutine(RunSession());
@@ -108,7 +127,7 @@ namespace King.UI
                     // a coin toss.
                     handView.Show(hands[(int)Seat.South]);
                     handView.DisableAll();
-                    statusLine.Set($"Deal {session.DealNumber}/{Session.DealCount}   your call");
+                    statusLine.Set($"El {session.DealNumber}/{Session.DealCount}   kontratı seçin");
                     ContractCall? picked = null;
                     picker.Show(available, c => picked = c);
                     while (!picked.HasValue)
@@ -126,7 +145,7 @@ namespace King.UI
                 scoresheet.Refresh(session);
                 deal = null;
             }
-            statusLine.Set("Session over");
+            statusLine.Set("Oyun bitti");
             sessionOver.Show(session.Totals);
         }
 
@@ -159,9 +178,9 @@ namespace King.UI
                 var completed = deal.Play(chosen);
                 RefreshTable();
                 if (heartsMatter && !wasBroken && deal.HeartsBroken)
-                    banner.Flash(this, "Hearts are broken", 2f);
+                    banner.Flash(this, "Kupa açıldı", 2f);
                 if (deal.IsComplete && deal.History.Count < 13)
-                    banner.Flash(this, "Nothing left to score — the deal ends early", 2.5f);
+                    banner.Flash(this, "Puanlanacak kart kalmadı — el erken bitti", 2.5f);
                 if (completed != null)
                 {
                     // The engine has already swept the trick into history, so put it
@@ -186,10 +205,10 @@ namespace King.UI
 
         string StatusText()
         {
-            string turn = deal.IsComplete ? "deal over"
-                : deal.ToPlay == Seat.South ? "your turn"
-                : GameText.SeatLabel(deal.ToPlay) + " to play";
-            return $"Deal {session.DealNumber}/{Session.DealCount}   {GameText.SeatLabel(session.Caller)} called {GameText.ContractLabel(deal.Contract)}   {turn}";
+            string turn = deal.IsComplete ? "el bitti"
+                : deal.ToPlay == Seat.South ? "sıra sizde"
+                : GameText.SeatLabel(deal.ToPlay) + " oynayacak";
+            return $"El {session.DealNumber}/{Session.DealCount}   {GameText.SeatLabel(session.Caller)}: {GameText.ContractLabel(deal.Contract)}   {turn}";
         }
 
         void Restart()
