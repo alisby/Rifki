@@ -4,103 +4,276 @@ using UnityEngine.UI;
 
 namespace King.UI
 {
-    // The paper scoresheet: twenty rows of deal, caller, contract and the four
-    // point columns, with a running-totals row under them. A button in the top
-    // right corner shows and hides it; the cells are built once and refilled
-    // after every deal.
+    // Compact score grid: game information on the left and one score
+    // column for each player.
     public sealed class ScoresheetPanel
     {
         const int Rows = Session.DealCount;
 
-        static readonly float[] ColumnX = { 32f, 108f, 252f, 492f, 612f, 732f, 852f };
-        static readonly float[] ColumnWidth = { 68f, 136f, 224f, 108f, 108f, 108f, 108f };
+        static readonly float[] ColumnX =
+        {
+            24f, 330f, 486f, 642f, 798f
+        };
+
+        static readonly float[] ColumnWidth =
+        {
+            292f, 144f, 144f, 144f, 144f
+        };
+
+        static readonly Color PanelColor =
+            new Color(0.025f, 0.085f, 0.05f, 0.98f);
+
+        static readonly Color HeaderColor =
+            new Color(0.075f, 0.14f, 0.095f, 1f);
+
+        static readonly Color RowColorA =
+            new Color(0.075f, 0.095f, 0.085f, 0.98f);
+
+        static readonly Color RowColorB =
+            new Color(0.095f, 0.115f, 0.10f, 0.98f);
+
+        static readonly Color TotalColor =
+            new Color(0.075f, 0.16f, 0.095f, 1f);
+
+        static readonly Color NegativeColor =
+            new Color(0.92f, 0.56f, 0.56f, 1f);
+
+        static readonly Color PositiveColor =
+            new Color(0.72f, 0.86f, 0.68f, 1f);
 
         readonly GameObject panel;
-        readonly Text[,] cells = new Text[Rows + 1, 7];   // last row is the running totals
+
+        // 20 deal rows + final totals row.
+        // Column 0 = game, columns 1-4 = players.
+        readonly Text[,] cells = new Text[Rows + 1, 5];
 
         public ScoresheetPanel(Transform canvas)
         {
-            var toggleRect = UiKit.Rect("ScoresToggle", canvas, Vector2.one, Vector2.one,
-                new Vector2(-24f, -14f), new Vector2(150f, 48f));
-            var toggleImage = UiKit.RoundedImage(toggleRect, new Color(0.05f, 0.14f, 0.08f, 0.92f));
-            var toggle = UiKit.MakeButton(toggleImage);
-            UiKit.Fill("Label", toggleRect, "Puanlar", 26, CardStyle.Cream, TextAnchor.MiddleCenter);
-            toggle.onClick.AddListener(() => panel.SetActive(!panel.activeSelf));
+            var toggleRect = UiKit.Rect(
+                "ScoresToggle",
+                canvas,
+                Vector2.one,
+                Vector2.one,
+                new Vector2(-24f, -14f),
+                new Vector2(150f, 48f));
 
-            var panelRect = UiKit.Rect("Scoresheet", canvas, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 65f), new Vector2(1000f, 560f));
-            var background = UiKit.RoundedImage(panelRect, new Color(0.04f, 0.12f, 0.07f, 0.97f));
-            background.raycastTarget = true;   // cards under the sheet should not catch clicks
+            var toggleImage = UiKit.RoundedImage(
+                toggleRect,
+                new Color(0.05f, 0.14f, 0.08f, 0.92f));
+
+            var toggle = UiKit.MakeButton(toggleImage);
+
+            UiKit.Fill(
+                "Label",
+                toggleRect,
+                "Puanlar",
+                26,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
+
+            toggle.onClick.AddListener(
+                () => panel.SetActive(!panel.activeSelf));
+
+            var panelRect = UiKit.Rect(
+                "Scoresheet",
+                canvas,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 30f),
+                new Vector2(970f, 640f));
+
+            var background = UiKit.RoundedImage(
+                panelRect,
+                PanelColor);
+
+            background.raycastTarget = true;
             panel = panelRect.gameObject;
 
             string[] headers =
             {
-                "El",
-                "Söyleyen",
-                "Kontrat",
+                "Oyun",
                 GameText.SeatLabel(Seat.South),
                 GameText.SeatLabel(Seat.West),
                 GameText.SeatLabel(Seat.North),
                 GameText.SeatLabel(Seat.East)
             };
-            for (int c = 0; c < 7; c++)
-            {
-                var header = Cell(panelRect, c, 26f, headers[c]);
-                header.fontStyle = FontStyle.Bold;
-                header.color = CardStyle.Gold;
 
-                if (c >= 3)
+            for (int c = 0; c < 5; c++)
+            {
+                var header = GridCell(
+                    panelRect,
+                    c,
+                    26f,
+                    38f,
+                    headers[c],
+                    HeaderColor,
+                    c == 0
+                        ? TextAnchor.MiddleLeft
+                        : TextAnchor.MiddleCenter,
+                    21);
+
+                header.fontStyle = FontStyle.Bold;
+                header.color = c == 0
+                    ? CardStyle.Gold
+                    : CardStyle.Cream;
+
+                if (c > 0)
                 {
                     header.resizeTextForBestFit = true;
-                    header.resizeTextMinSize = 14;
-                    header.resizeTextMaxSize = 20;
+                    header.resizeTextMinSize = 13;
+                    header.resizeTextMaxSize = 21;
                 }
             }
 
-            for (int r = 0; r <= Rows; r++)
+            for (int r = 0; r < Rows; r++)
             {
-                float y = r < Rows ? 54f + r * 23f : 54f + Rows * 23f + 10f;
-                for (int c = 0; c < 7; c++)
-                    cells[r, c] = Cell(panelRect, c, y, "");
-                if (r == Rows)
-                    for (int c = 0; c < 7; c++)
-                        cells[r, c].fontStyle = FontStyle.Bold;
+                float y = 72f + r * 24f;
+
+                Color rowColor =
+                    r % 2 == 0 ? RowColorA : RowColorB;
+
+                for (int c = 0; c < 5; c++)
+                {
+                    cells[r, c] = GridCell(
+                        panelRect,
+                        c,
+                        y,
+                        22f,
+                        "",
+                        rowColor,
+                        c == 0
+                            ? TextAnchor.MiddleLeft
+                            : TextAnchor.MiddleCenter,
+                        c == 0 ? 18 : 19);
+                }
+
+                cells[r, 0].resizeTextForBestFit = true;
+                cells[r, 0].resizeTextMinSize = 13;
+                cells[r, 0].resizeTextMaxSize = 18;
             }
-            cells[Rows, 2].text = "Toplam";
+
+            float totalY = 72f + Rows * 24f + 12f;
+
+            for (int c = 0; c < 5; c++)
+            {
+                cells[Rows, c] = GridCell(
+                    panelRect,
+                    c,
+                    totalY,
+                    30f,
+                    "",
+                    TotalColor,
+                    c == 0
+                        ? TextAnchor.MiddleLeft
+                        : TextAnchor.MiddleCenter,
+                    21);
+
+                cells[Rows, c].fontStyle = FontStyle.Bold;
+            }
+
+            cells[Rows, 0].text = "Toplam";
+            cells[Rows, 0].color = CardStyle.Gold;
 
             panel.SetActive(false);
         }
 
-        Text Cell(RectTransform parent, int column, float y, string text)
+        Text GridCell(
+            RectTransform parent,
+            int column,
+            float y,
+            float height,
+            string text,
+            Color backgroundColor,
+            TextAnchor alignment,
+            int fontSize)
         {
-            var alignment = column < 3 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight;
-            return UiKit.Label("Cell", parent, new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(ColumnX[column], -y), new Vector2(ColumnWidth[column], 24f),
-                text, 20, CardStyle.Cream, alignment);
+            var rt = UiKit.Rect(
+                "GridCell",
+                parent,
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(ColumnX[column], -y),
+                new Vector2(ColumnWidth[column], height));
+
+            var image = rt.gameObject.AddComponent<Image>();
+            image.color = backgroundColor;
+            image.raycastTarget = false;
+
+            float padding = column == 0 ? 10f : 4f;
+
+            return UiKit.Label(
+                "Text",
+                rt,
+                new Vector2(0f, 0.5f),
+                new Vector2(0f, 0.5f),
+                new Vector2(padding, 0f),
+                new Vector2(
+                    ColumnWidth[column] - padding * 2f,
+                    height),
+                text,
+                fontSize,
+                CardStyle.Cream,
+                alignment);
         }
 
         public void Refresh(Session session)
         {
             var sheet = session.Sheet;
+
             for (int r = 0; r < Rows; r++)
             {
-                cells[r, 0].text = (r + 1).ToString();
                 if (r < sheet.Count)
                 {
                     var row = sheet[r];
-                    cells[r, 1].text = GameText.SeatLabel(row.Caller);
-                    cells[r, 2].text = GameText.ContractLabel(row.Contract);
+
+                    cells[r, 0].text =
+                        (r + 1) + ". " +
+                        GameText.ContractLabel(row.Contract) +
+                        " · " +
+                        GameText.SeatLabel(row.Caller);
+
+                    cells[r, 0].color =
+                        row.Contract.Type == ContractType.Trump
+                            ? CardStyle.Gold
+                            : CardStyle.Cream;
+
                     for (int s = 0; s < 4; s++)
-                        cells[r, 3 + s].text = row.Points[s].ToString();
+                    {
+                        int points = row.Points[s];
+
+                        cells[r, 1 + s].text =
+                            points.ToString();
+
+                        if (points < 0)
+                            cells[r, 1 + s].color =
+                                NegativeColor;
+                        else if (points > 0)
+                            cells[r, 1 + s].color =
+                                PositiveColor;
+                        else
+                            cells[r, 1 + s].color =
+                                CardStyle.Cream;
+                    }
                 }
                 else
                 {
-                    for (int c = 1; c < 7; c++)
+                    for (int c = 0; c < 5; c++)
+                    {
                         cells[r, c].text = "";
+                        cells[r, c].color =
+                            CardStyle.Cream;
+                    }
                 }
             }
+
             for (int s = 0; s < 4; s++)
-                cells[Rows, 3 + s].text = session.Totals[s].ToString();
+            {
+                cells[Rows, 1 + s].text =
+                    session.Totals[s].ToString();
+
+                cells[Rows, 1 + s].color =
+                    CardStyle.Cream;
+            }
         }
     }
 }

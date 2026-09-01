@@ -16,7 +16,7 @@ namespace King.UI
             new Color(0.025f, 0.10f, 0.06f, 0.88f);
 
         static readonly Vector2 BoxSize =
-            new Vector2(340f, 52f);
+            new Vector2(500f, 52f);
 
         const int FontSize = 30;
 
@@ -80,53 +80,51 @@ namespace King.UI
 
             string input = value.Trim();
 
-            int turnIndex = input.LastIndexOf(
-                " sıra ",
-                StringComparison.OrdinalIgnoreCase);
-
-            string mainPart = input;
-            string turnPart = "";
-
-            if (turnIndex >= 0)
-            {
-                mainPart = input.Substring(0, turnIndex).Trim();
-                turnPart = input.Substring(turnIndex + 1).Trim();
-            }
-
-            string[] parts = mainPart.Split(
-                new[] { ' ' },
-                3,
+            // GameBootstrap separates the three status sections
+            // with multiple spaces.
+            string[] sections = input.Split(
+                new[] { "  " },
                 StringSplitOptions.RemoveEmptyEntries);
 
-            if (parts.Length >= 2 &&
-                parts[0].Equals("El", StringComparison.OrdinalIgnoreCase) &&
-                parts[1].Contains("/"))
+            string dealPart =
+                sections.Length > 0 ? sections[0].Trim() : "";
+
+            string contractPart =
+                sections.Length > 1 ? sections[1].Trim() : "";
+
+            string turnPart =
+                sections.Length > 2 ? sections[2].Trim() : "";
+
+            if (dealPart.StartsWith(
+                "El ",
+                StringComparison.OrdinalIgnoreCase))
             {
-                dealText.text = parts[1];
-                contractText.text =
-                    parts.Length >= 3 ? parts[2] : "";
+                dealText.text = dealPart.Substring(3).Trim();
             }
             else
             {
-                dealText.text = "";
-                contractText.text = mainPart;
+                dealText.text = dealPart;
             }
 
-            if (!string.IsNullOrEmpty(turnPart))
+            contractText.text = contractPart;
+
+            if (turnPart.Equals(
+                "sıra sizde",
+                StringComparison.OrdinalIgnoreCase))
             {
-                turnPart =
+                turnText.text = "Sıra sizde!";
+            }
+            else if (!string.IsNullOrEmpty(turnPart))
+            {
+                turnText.text =
                     char.ToUpper(turnPart[0]) +
                     turnPart.Substring(1);
-
-                if (!turnPart.EndsWith("!"))
-                    turnPart += "!";
-
-                turnText.text = turnPart;
             }
             else
             {
                 turnText.text = "";
             }
         }
+
     }
 }

@@ -29,10 +29,39 @@ namespace King.Core
         // to see their hand before naming a contract.
         IReadOnlyList<Card>[] dealtHands;
 
+        // The first caller is whoever holds the two of diamonds.
+        Seat? firstCaller;
+
         // 1-based number of the next (or in-progress) deal.
         public int DealNumber { get; private set; } = 1;
 
-        public Seat Caller => (Seat)((DealNumber - 1) % 4);
+        public Seat Caller
+        {
+            get
+            {
+                if (!firstCaller.HasValue)
+                    return Seat.South;
+
+                Seat caller = firstCaller.Value;
+
+                for (int n = 1; n < DealNumber; n++)
+                    caller = RightOf(caller);
+
+                return caller;
+            }
+        }
+
+        // Contract calling rotates counter-clockwise: to the player on the right.
+        static Seat RightOf(Seat seat)
+        {
+            switch (seat)
+            {
+                case Seat.South: return Seat.East;
+                case Seat.East: return Seat.North;
+                case Seat.North: return Seat.West;
+                default: return Seat.South;
+            }
+        }
         public bool IsComplete => DealNumber > DealCount;
         public IReadOnlyList<int> Totals => totalsView;
         public IReadOnlyList<ScoreRow> Sheet => sheetView;
@@ -66,6 +95,13 @@ namespace King.Core
             return penaltyLeft[(int)t];
         }
 
+        public int PenaltySlotsLeft(Seat s)
+        {
+            if (s < Seat.South || s > Seat.East)
+                throw new ArgumentOutOfRangeException(nameof(s));
+            return penaltySlots[(int)s];
+        }
+
         public int TrumpCallsLeft(Seat s)
         {
             if (s < Seat.South || s > Seat.East)
@@ -89,6 +125,26 @@ namespace King.Core
                 dealtHands = new IReadOnlyList<Card>[4];
                 for (int i = 0; i < 4; i++)
                     dealtHands[i] = Array.AsReadOnly(dealt[i]);
+
+                // Only the first deal determines the starting caller.
+                // Find the player holding the two of diamonds.
+                if (!firstCaller.HasValue)
+                {
+                    for (int i = 0; i < 4 && !firstCaller.HasValue; i++)
+                    {
+                        foreach (var card in dealtHands[i])
+                        {
+                            if (card.Suit == Suit.Diamonds && card.Rank == Rank.Two)
+                            {
+                                firstCaller = (Seat)i;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!firstCaller.HasValue)
+                        throw new InvalidOperationException("two of diamonds was not found");
+                }
             }
             return (IReadOnlyList<Card>[])dealtHands.Clone();
         }

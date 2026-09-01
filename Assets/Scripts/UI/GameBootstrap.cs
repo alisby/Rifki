@@ -27,6 +27,8 @@ namespace King.UI
         TrickView trickView;
         OpponentsView opponentsView;
         StatusLine statusLine;
+        GameProgressPanel gameProgress;
+        PlayerQuotaView playerQuota;
         ScoresheetPanel scoresheet;
         NoticeBanner banner;
         ContractPicker picker;
@@ -65,6 +67,8 @@ namespace King.UI
             opponentsView = new OpponentsView(canvas);
             handView = new HandView(canvas, OnCardClicked);
             statusLine = new StatusLine(canvas);
+            gameProgress = new GameProgressPanel(canvas);
+            playerQuota = new PlayerQuotaView(canvas);
 
             // Creation order is draw order: the sheet sits over the table,
             // notices over the sheet, and the modals over everything.
@@ -78,6 +82,8 @@ namespace King.UI
                 bots[s] = new HeuristicAgent(seed + s);
 
             session = new Session(seed);
+            gameProgress.Refresh(session);
+            playerQuota.Refresh(session);
             scoresheet.Refresh(session);
             StartCoroutine(RunSession());
         }
@@ -118,8 +124,8 @@ namespace King.UI
         {
             while (!session.IsComplete)
             {
-                var available = session.AvailableContracts();
                 var hands = session.DealHands();
+                var available = session.AvailableContracts();
                 ContractCall call;
                 if (session.Caller == Seat.South)
                 {
@@ -140,8 +146,10 @@ namespace King.UI
                     call = bots[caller].ChooseContract(session, hands[caller], available);
                 }
                 deal = session.StartDeal(call);
+                playerQuota.Refresh(session);
                 yield return RunDeal();
                 session.FinishDeal();
+                gameProgress.Refresh(session);
                 scoresheet.Refresh(session);
                 deal = null;
             }
