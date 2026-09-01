@@ -106,7 +106,21 @@ namespace King.UI
                 dealText.text = dealPart;
             }
 
-            contractText.text = contractPart;
+            int colon = contractPart.IndexOf((char)58);
+            if (colon >= 0 && colon < contractPart.Length - 1)
+            {
+                string caller = contractPart.Substring(0, colon + 1);
+                string contract = contractPart.Substring(colon + 1).Trim();
+
+                string gold = ColorUtility.ToHtmlStringRGB(CardStyle.Gold);
+                contractText.text =
+                    caller + " <color=#" + gold + ">" +
+                    contract + "</color>";
+            }
+            else
+            {
+                contractText.text = contractPart;
+            }
 
             if (turnPart.Equals(
                 "sıra sizde",
