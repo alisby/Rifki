@@ -15,6 +15,11 @@ namespace King.Core
 
         Seat trickLeader;
 
+        // Koz kontratında, koz henüz oynanmadan önce kozla çıkış normalde
+        // yasaktır. Kontratı seçenin başlangıç elinde koz A-K-Q birlikteyse
+        // bu yasak baştan kalkar.
+        readonly bool trumpMayBeLedBeforeBroken;
+
         public ContractCall Contract { get; }
         public Seat ToPlay { get; private set; }
         public bool IsComplete { get; private set; }
@@ -25,6 +30,9 @@ namespace King.Core
 
         // Only meaningful in the hearts contracts, but tracked unconditionally.
         public bool HeartsBroken { get; private set; }
+
+        // İlk koz oynandığında true olur.
+        public bool TrumpBroken { get; private set; }
 
         public IReadOnlyList<(Seat Seat, Card Card)> CurrentTrick => currentTrickView;
         public IReadOnlyList<CompletedTrick> History => historyView;
@@ -58,6 +66,18 @@ namespace King.Core
             historyView = history.AsReadOnly();
 
             Contract = contract;
+
+            if (contract.TrumpSuit != null)
+            {
+                Suit trump = contract.TrumpSuit.Value;
+                var callerHand = this.hands[(int)leader];
+
+                trumpMayBeLedBeforeBroken =
+                    callerHand.Any(c => c.Suit == trump && c.Rank == Rank.Ace)
+                    && callerHand.Any(c => c.Suit == trump && c.Rank == Rank.King)
+                    && callerHand.Any(c => c.Suit == trump && c.Rank == Rank.Queen);
+            }
+
             ToPlay = leader;
             trickLeader = leader;
             TrickNumber = 1;
@@ -91,6 +111,22 @@ namespace King.Core
                 if (offSuit.Count > 0)
                     return offSuit;
             }
+
+            // Koz henüz açılmamışsa kozla çıkılamaz.
+            // İstisna: kontratı seçen oyuncunun başlangıç elinde
+            // koz As-Papaz-Kız birlikte bulunuyorsa koz baştan açılabilir.
+            if (Contract.TrumpSuit != null
+                && !TrumpBroken
+                && !trumpMayBeLedBeforeBroken)
+            {
+                var nonTrumps =
+                    hand.Where(c => c.Suit != Contract.TrumpSuit.Value).ToList();
+
+                // Oyuncunun elinde yalnızca koz kaldıysa oyun kilitlenmemeli.
+                if (nonTrumps.Count > 0)
+                    return nonTrumps;
+            }
+
             return new List<Card>(hand);
         }
 
@@ -174,6 +210,11 @@ namespace King.Core
             if (card.Suit == Suit.Hearts)
                 HeartsBroken = true;
 
+            // İlk koz oynandığı andan itibaren koz açılmış sayılır.
+            if (Contract.TrumpSuit != null
+                && card.Suit == Contract.TrumpSuit.Value)
+                TrumpBroken = true;
+
             currentTrick.Add((ToPlay, card));
 
             if (currentTrick.Count < 4)
@@ -199,6 +240,14 @@ namespace King.Core
                 ToPlay = winner;
             }
             return trick;
+        }
+
+        public int UnitsTaken(Seat seat)
+        {
+            if (seat < Seat.South || seat > Seat.East)
+                throw new ArgumentOutOfRangeException(nameof(seat));
+
+            return CountUnits()[(int)seat];
         }
 
         public DealScore Score()

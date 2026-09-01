@@ -4,12 +4,16 @@ using UnityEngine.UI;
 
 namespace King.UI
 {
-    // Remaining contract calls below each player name:
-    // three red circles for penalty calls and two blue triangles for trump calls.
+    // Three penalty quotas and two trump quotas below each player.
+    // Used symbols remain visible but faded.
+    // Current-deal captured units are shown below their symbol group.
     public sealed class PlayerQuotaView
     {
         readonly Text[,] penalty = new Text[4, 3];
         readonly Text[,] trump = new Text[4, 2];
+
+        readonly Text[] penaltyTaken = new Text[4];
+        readonly Text[] trumpTaken = new Text[4];
 
         static readonly Color PenaltyColor =
             new Color(0.82f, 0.18f, 0.18f, 1f);
@@ -18,33 +22,42 @@ namespace King.UI
             new Color(0.25f, 0.48f, 0.88f, 1f);
 
         static readonly Color QuotaBoxColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.72f);
+            new Color(0.025f, 0.10f, 0.06f, 0.78f);
+
+        const float UsedAlpha = 0.20f;
 
         public PlayerQuotaView(Transform canvas)
         {
+            // South is moved down, closer to the human cards.
             Build(
                 canvas,
                 Seat.South,
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -212f));
+                new Vector2(0f, -258f));
 
             Build(
                 canvas,
                 Seat.West,
                 new Vector2(0f, 0.5f),
-                new Vector2(135f, -67f));
+                new Vector2(135f, -4f));
 
             Build(
                 canvas,
                 Seat.North,
                 new Vector2(0.5f, 1f),
-                new Vector2(0f, -220f));
+                new Vector2(0f, -108f));
 
             Build(
                 canvas,
                 Seat.East,
                 new Vector2(1f, 0.5f),
-                new Vector2(-135f, -67f));
+                new Vector2(-135f, -4f));
+        }
+
+        static Color Alpha(Color color, float alpha)
+        {
+            color.a = alpha;
+            return color;
         }
 
         void Build(
@@ -59,14 +72,14 @@ namespace King.UI
                 anchor,
                 new Vector2(0.5f, 0.5f),
                 position,
-                new Vector2(140f, 30f));
+                new Vector2(220f, 72f));
 
             UiKit.RoundedImage(row, QuotaBoxColor);
 
             float[] x =
             {
-                -46f, -25f, -4f,
-                25f, 47f
+                -76f, -40f, -4f,
+                48f, 84f
             };
 
             for (int i = 0; i < 3; i++)
@@ -76,10 +89,10 @@ namespace King.UI
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
-                    new Vector2(x[i], 0f),
-                    new Vector2(20f, 22f),
+                    new Vector2(x[i], 13f),
+                    new Vector2(34f, 36f),
                     "●",
-                    20,
+                    34,
                     PenaltyColor,
                     TextAnchor.MiddleCenter);
             }
@@ -91,13 +104,37 @@ namespace King.UI
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
-                    new Vector2(x[3 + i], 0f),
-                    new Vector2(20f, 22f),
+                    new Vector2(x[3 + i], 13f),
+                    new Vector2(34f, 36f),
                     "▲",
-                    18,
+                    32,
                     TrumpColor,
                     TextAnchor.MiddleCenter);
             }
+
+            penaltyTaken[(int)seat] = UiKit.Label(
+                "PenaltyTaken",
+                row,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(-40f, -23f),
+                new Vector2(84f, 32f),
+                "",
+                30,
+                PenaltyColor,
+                TextAnchor.MiddleCenter);
+
+            trumpTaken[(int)seat] = UiKit.Label(
+                "TrumpTaken",
+                row,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(66f, -23f),
+                new Vector2(84f, 32f),
+                "",
+                30,
+                TrumpColor,
+                TextAnchor.MiddleCenter);
         }
 
         public void Refresh(Session session)
@@ -113,12 +150,53 @@ namespace King.UI
                     session.TrumpCallsLeft(seat);
 
                 for (int i = 0; i < 3; i++)
-                    penalty[s, i].gameObject.SetActive(
-                        i < penaltiesLeft);
+                {
+                    penalty[s, i].color =
+                        Alpha(
+                            PenaltyColor,
+                            i < penaltiesLeft ? 1f : UsedAlpha);
+                }
 
                 for (int i = 0; i < 2; i++)
-                    trump[s, i].gameObject.SetActive(
-                        i < trumpsLeft);
+                {
+                    trump[s, i].color =
+                        Alpha(
+                            TrumpColor,
+                            i < trumpsLeft ? 1f : UsedAlpha);
+                }
+            }
+
+            ClearDealCounts();
+        }
+
+        public void RefreshDeal(DealEngine deal)
+        {
+            ClearDealCounts();
+
+            if (deal == null)
+                return;
+
+            for (int s = 0; s < 4; s++)
+            {
+                int taken = deal.UnitsTaken((Seat)s);
+
+                if (deal.Contract.Type == ContractType.Trump)
+                {
+                    trumpTaken[s].text = taken.ToString();
+                }
+                else
+                {
+                    penaltyTaken[s].text = taken.ToString();
+                }
+            }
+        }
+
+        public void ClearDealCounts()
+        {
+            for (int s = 0; s < 4; s++)
+            {
+                penaltyTaken[s].text = "";
+                trumpTaken[s].text = "";
             }
         }
     }

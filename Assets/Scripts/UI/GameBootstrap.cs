@@ -30,6 +30,7 @@ namespace King.UI
         GameProgressPanel gameProgress;
         PlayerQuotaView playerQuota;
         ScoresheetPanel scoresheet;
+        RemainingCardsPanel remainingCards;
         NoticeBanner banner;
         ContractPicker picker;
         SessionOverScreen sessionOver;
@@ -73,6 +74,7 @@ namespace King.UI
             // Creation order is draw order: the sheet sits over the table,
             // notices over the sheet, and the modals over everything.
             scoresheet = new ScoresheetPanel(canvas);
+            remainingCards = new RemainingCardsPanel(canvas);
             banner = new NoticeBanner(canvas);
             picker = new ContractPicker(canvas);
             sessionOver = new SessionOverScreen(canvas, Restart);
@@ -125,6 +127,7 @@ namespace King.UI
             while (!session.IsComplete)
             {
                 var hands = session.DealHands();
+                remainingCards.ResetForNewDeal();
                 var available = session.AvailableContracts();
                 ContractCall call;
                 if (session.Caller == Seat.South)
@@ -135,7 +138,7 @@ namespace King.UI
                     handView.DisableAll();
                     statusLine.Set($"El {session.DealNumber}/{Session.DealCount}   kontratı seçin");
                     ContractCall? picked = null;
-                    picker.Show(available, c => picked = c);
+                    picker.Show(session, available, c => picked = c);
                     while (!picked.HasValue)
                         yield return null;
                     call = picked.Value;
@@ -146,8 +149,11 @@ namespace King.UI
                     call = bots[caller].ChooseContract(session, hands[caller], available);
                 }
                 deal = session.StartDeal(call);
+                remainingCards.Refresh(deal);
                 playerQuota.Refresh(session);
+                playerQuota.RefreshDeal(deal);
                 yield return RunDeal();
+                playerQuota.ClearDealCounts();
                 session.FinishDeal();
                 gameProgress.Refresh(session);
                 scoresheet.Refresh(session);
@@ -194,7 +200,8 @@ namespace King.UI
                     // The engine has already swept the trick into history, so put it
                     // back on the table while it lingers.
                     trickView.ShowCompleted(completed);
-                    yield return new WaitForSeconds(TrickLinger);
+                    yield return new WaitForSeconds(
+                        TrickLinger + (deal.IsComplete ? 4f : 0f));
                     trickView.Clear();
                     // Clear() resets all four seat labels, so re-mark whoever leads next.
                     trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
@@ -206,6 +213,8 @@ namespace King.UI
         {
             handView.Show(deal.HandOf(Seat.South));
             opponentsView.Refresh(deal);
+            playerQuota.RefreshDeal(deal);
+            remainingCards.Refresh(deal);
             trickView.ShowCurrent(deal.CurrentTrick);
             trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
             statusLine.Set(StatusText());

@@ -49,10 +49,10 @@ namespace King.UI
                 center,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -220f),
-                new Vector2(160f, 30f),
+                new Vector2(0f, -232f),
+                new Vector2(190f, 34f),
                 GameText.SeatLabel(Seat.South),
-                26,
+                30,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -62,10 +62,10 @@ namespace King.UI
                 canvas,
                 new Vector2(0f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(135f, -35f),
-                new Vector2(160f, 30f),
+                new Vector2(135f, 60f),
+                new Vector2(190f, 34f),
                 GameText.SeatLabel(Seat.West),
-                26,
+                30,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -75,10 +75,10 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 1f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -185f),
-                new Vector2(160f, 30f),
+                new Vector2(0f, -44f),
+                new Vector2(190f, 34f),
                 GameText.SeatLabel(Seat.North),
-                26,
+                30,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -88,10 +88,10 @@ namespace King.UI
                 canvas,
                 new Vector2(1f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-135f, -35f),
-                new Vector2(160f, 30f),
+                new Vector2(-135f, 60f),
+                new Vector2(190f, 34f),
                 GameText.SeatLabel(Seat.East),
-                26,
+                30,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
         }

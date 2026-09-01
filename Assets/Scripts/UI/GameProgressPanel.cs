@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace King.UI
 {
-    // Shows the six penalty contracts that are still relevant.
-    // A contract stays visible after the first play.
-    // After the second completed play, its box disappears.
+    // Six penalty contracts remain permanently visible.
+    // Played contracts fade instead of disappearing.
     public sealed class GameProgressPanel
     {
         static readonly ContractType[] Types =
@@ -26,7 +25,11 @@ namespace King.UI
             new Color(0.045f, 0.14f, 0.085f, 0.92f);
 
         readonly RectTransform panel;
-        readonly RectTransform[] rows = new RectTransform[Types.Length];
+        readonly RectTransform[] rows =
+            new RectTransform[Types.Length];
+
+        readonly CanvasGroup[] rowGroups =
+            new CanvasGroup[Types.Length];
 
         const float RowWidth = 145f;
         const float RowHeight = 30f;
@@ -51,28 +54,40 @@ namespace King.UI
             var title = UiKit.Label(
                 "Title",
                 panel,
-                new Vector2(0f, 1f),
-                new Vector2(0f, 1f),
-                new Vector2(12f, -10f),
-                new Vector2(200f, 30f),
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(0f, -10f),
+                new Vector2(306f, 30f),
                 "Oyunlar",
                 27,
                 CardStyle.Gold,
-                TextAnchor.MiddleLeft);
+                TextAnchor.MiddleCenter);
 
             title.fontStyle = FontStyle.Bold;
 
             for (int i = 0; i < Types.Length; i++)
             {
+                int column = i / RowsPerColumn;
+                int row = i % RowsPerColumn;
+
+                float x =
+                    StartX + column * (RowWidth + ColumnGap);
+
+                float y =
+                    StartY - row * RowStep;
+
                 rows[i] = UiKit.Rect(
                     Types[i] + "Row",
                     panel,
                     new Vector2(0f, 1f),
                     new Vector2(0f, 1f),
-                    Vector2.zero,
+                    new Vector2(x, y),
                     new Vector2(RowWidth, RowHeight));
 
                 UiKit.RoundedImage(rows[i], RowColor);
+
+                rowGroups[i] =
+                    rows[i].gameObject.AddComponent<CanvasGroup>();
 
                 var label = UiKit.Label(
                     "Label",
@@ -94,27 +109,18 @@ namespace King.UI
 
         public void Refresh(Session session)
         {
-            int visibleIndex = 0;
-
             for (int i = 0; i < Types.Length; i++)
             {
-                int played = 2 - session.PenaltyCallsLeft(Types[i]);
-                bool show = played < 2;
+                int played =
+                    2 - session.PenaltyCallsLeft(Types[i]);
 
-                rows[i].gameObject.SetActive(show);
-
-                if (!show)
-                    continue;
-
-                int column = visibleIndex / RowsPerColumn;
-                int row = visibleIndex % RowsPerColumn;
-
-                float x = StartX + column * (RowWidth + ColumnGap);
-                float y = StartY - row * RowStep;
-
-                rows[i].anchoredPosition = new Vector2(x, y);
-
-                visibleIndex++;
+                // Hic oynanmadi: tam gorunur.
+                // Bir kez oynandi: orta derecede soluk.
+                // Iki kez oynandi: belirgin bicimde soluk.
+                rowGroups[i].alpha =
+                    played <= 0 ? 1f :
+                    played == 1 ? 0.58f :
+                    0.25f;
             }
         }
     }

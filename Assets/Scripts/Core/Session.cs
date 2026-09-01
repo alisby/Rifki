@@ -78,12 +78,19 @@ namespace King.Core
             var list = new List<ContractType>();
             if (IsComplete)
                 return list;
+            // İlk elde gerçek kontrat seçicisi, karo 2 bulunan el
+            // dağıtılmadan bilinemez. Kontrat listesini oluşturmadan önce
+            // ilk dağıtımı gerçekleştirerek Caller değerini sabitle.
+            if (!firstCaller.HasValue)
+                DealHands();
+
             int caller = (int)Caller;
             if (penaltySlots[caller] > 0)
                 for (var t = ContractType.NoTricks; t < ContractType.Trump; t++)
                     if (penaltyLeft[(int)t] > 0)
                         list.Add(t);
-            if (trumpLeft[caller] > 0)
+            // İlk dört oyunda koz kontratı seçilemez.
+            if (DealNumber > 4 && trumpLeft[caller] > 0)
                 list.Add(ContractType.Trump);
             return list;
         }
@@ -156,9 +163,19 @@ namespace King.Core
             if (pending != null)
                 throw new InvalidOperationException("a deal is already in progress");
 
+            // İlk elde Caller hesaplanmadan önce kartların dağıtılmış
+            // olması gerekir. Aksi halde kota Southtan düşüp oyun başka
+            // oyuncu adına başlayabilir.
+            var hands = DealHands();
             int caller = (int)Caller;
+
             if (call.Type == ContractType.Trump)
             {
+                // Arayüz veya yapay zekâ bu kuralı aşmaya çalışsa bile
+                // ilk dört oyunda koz kontratı başlatılamaz.
+                if (DealNumber <= 4)
+                    throw new InvalidOperationException("trump cannot be called in the first four deals");
+
                 if (trumpLeft[caller] == 0)
                     throw new InvalidOperationException(Caller + " has already called trump twice");
                 trumpLeft[caller]--;
@@ -174,7 +191,7 @@ namespace King.Core
             }
 
             // Quota checks run first so a rejected call never burns a shuffle.
-            pending = new DealEngine(call, DealHands(), Caller);
+            pending = new DealEngine(call, hands, Caller);
             dealtHands = null;
             return pending;
         }
