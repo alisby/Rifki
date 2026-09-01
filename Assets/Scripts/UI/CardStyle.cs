@@ -6,10 +6,10 @@ namespace King.UI
     // Glyphs and colors for drawing cards.
     public static class CardStyle
     {
-        public static readonly Color Felt = new Color(0.086f, 0.42f, 0.20f);
-        public static readonly Color FeltDark = new Color(0.055f, 0.28f, 0.13f);
+        public static readonly Color Felt = new Color(0.065f, 0.23f, 0.14f);
+        public static readonly Color FeltDark = new Color(0.038f, 0.15f, 0.09f);
         public static readonly Color CardWhite = new Color(0.98f, 0.97f, 0.94f);
-        public static readonly Color BackBlue = new Color(0.16f, 0.25f, 0.55f);
+        public static readonly Color BackBlue = new Color(0.24f, 0.15f, 0.17f);
         public static readonly Color RedInk = new Color(0.78f, 0.09f, 0.11f);
         public static readonly Color BlackInk = new Color(0.13f, 0.12f, 0.12f);
         public static readonly Color Gold = new Color(1f, 0.85f, 0.35f);
