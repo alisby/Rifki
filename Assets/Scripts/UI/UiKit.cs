@@ -32,10 +32,63 @@ namespace King.UI
                 if (!triedRounded)
                 {
                     triedRounded = true;
-                    rounded = null; // Unity 6: legacy UISprite unavailable
+                    rounded = CreateRoundedSprite();
                 }
+
                 return rounded;
             }
+        }
+
+        static Sprite CreateRoundedSprite()
+        {
+            const int size = 64;
+            const int radius = 12;
+
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            texture.name = "RuntimeRoundedRect";
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.filterMode = FilterMode.Bilinear;
+
+            var pixels = new Color32[size * size];
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float px = x + 0.5f;
+                    float py = y + 0.5f;
+
+                    float cx = Mathf.Clamp(px, radius, size - radius);
+                    float cy = Mathf.Clamp(py, radius, size - radius);
+
+                    float dx = px - cx;
+                    float dy = py - cy;
+                    float distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+                    float alpha = Mathf.Clamp01(radius + 0.5f - distance);
+
+                    pixels[y * size + x] =
+                        new Color32(255, 255, 255, (byte)Mathf.RoundToInt(alpha * 255f));
+                }
+            }
+
+            texture.SetPixels32(pixels);
+            texture.Apply();
+
+            var border = new Vector4(radius, radius, radius, radius);
+
+            var sprite = Sprite.Create(
+                texture,
+                new Rect(0, 0, size, size),
+                new Vector2(0.5f, 0.5f),
+                100f,
+                0,
+                SpriteMeshType.FullRect,
+                border
+            );
+
+            sprite.name = "RuntimeRoundedRect";
+            return sprite;
         }
 
         // A RectTransform anchored to a single point of its parent.
