@@ -28,15 +28,23 @@ namespace King.UI
         readonly RectTransform panel;
         readonly RectTransform[] rows = new RectTransform[Types.Length];
 
+        const float RowWidth = 145f;
+        const float RowHeight = 30f;
+        const float ColumnGap = 8f;
+        const float StartX = 12f;
+        const float StartY = -54f;
+        const float RowStep = 34f;
+        const int RowsPerColumn = 3;
+
         public GameProgressPanel(Transform canvas)
         {
             panel = UiKit.Rect(
                 "GameProgressPanel",
                 canvas,
-                new Vector2(0.5f, 1f),
                 new Vector2(1f, 1f),
-                new Vector2(-165f, -18f),
-                new Vector2(300f, 310f));
+                new Vector2(1f, 1f),
+                new Vector2(-190f, -18f),
+                new Vector2(330f, 172f));
 
             UiKit.RoundedImage(panel, PanelColor);
 
@@ -45,10 +53,10 @@ namespace King.UI
                 panel,
                 new Vector2(0f, 1f),
                 new Vector2(0f, 1f),
-                new Vector2(16f, -12f),
-                new Vector2(260f, 36f),
+                new Vector2(12f, -10f),
+                new Vector2(200f, 30f),
                 "Oyunlar",
-                28,
+                27,
                 CardStyle.Gold,
                 TextAnchor.MiddleLeft);
 
@@ -61,22 +69,26 @@ namespace King.UI
                     panel,
                     new Vector2(0f, 1f),
                     new Vector2(0f, 1f),
-                    new Vector2(12f, -58f - i * 40f),
-                    new Vector2(276f, 34f));
+                    Vector2.zero,
+                    new Vector2(RowWidth, RowHeight));
 
                 UiKit.RoundedImage(rows[i], RowColor);
 
-                UiKit.Label(
+                var label = UiKit.Label(
                     "Label",
                     rows[i],
                     new Vector2(0f, 0.5f),
                     new Vector2(0f, 0.5f),
-                    new Vector2(12f, 0f),
-                    new Vector2(252f, 34f),
+                    new Vector2(10f, 0f),
+                    new Vector2(RowWidth - 20f, RowHeight),
                     GameText.ContractLabel(Types[i]),
-                    23,
+                    21,
                     CardStyle.Cream,
                     TextAnchor.MiddleLeft);
+
+                label.resizeTextForBestFit = true;
+                label.resizeTextMinSize = 14;
+                label.resizeTextMaxSize = 21;
             }
         }
 
@@ -94,8 +106,13 @@ namespace King.UI
                 if (!show)
                     continue;
 
-                rows[i].anchoredPosition =
-                    new Vector2(12f, -58f - visibleIndex * 40f);
+                int column = visibleIndex / RowsPerColumn;
+                int row = visibleIndex % RowsPerColumn;
+
+                float x = StartX + column * (RowWidth + ColumnGap);
+                float y = StartY - row * RowStep;
+
+                rows[i].anchoredPosition = new Vector2(x, y);
 
                 visibleIndex++;
             }
