@@ -113,16 +113,19 @@ namespace King.UI
                 StringComparison.OrdinalIgnoreCase))
             {
                 turnText.text = "Sıra sizde!";
+                turnText.color = CardStyle.Gold;
             }
             else if (!string.IsNullOrEmpty(turnPart))
             {
                 turnText.text =
                     char.ToUpper(turnPart[0]) +
                     turnPart.Substring(1);
+                turnText.color = CardStyle.Cream;
             }
             else
             {
                 turnText.text = "";
+                turnText.color = CardStyle.Cream;
             }
         }
 
