@@ -151,6 +151,7 @@ namespace King.UI
                     call = bots[caller].ChooseContract(session, hands[caller], available);
                 }
                 deal = session.StartDeal(call);
+                trickView.MarkCaller(session.Caller);
                 remainingCards.Refresh(deal);
                 playerQuota.Refresh(session);
                 playerQuota.RefreshDeal(deal);

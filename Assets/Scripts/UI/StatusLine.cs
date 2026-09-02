@@ -16,7 +16,7 @@ namespace King.UI
         string currentIconPath;
 
         static readonly Color BoxColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.90f);
+            new Color(0f, 0f, 0f, 0f);
 
         static readonly Color PenaltyColor =
             new Color(0.90f, 0.38f, 0.38f, 1f);
@@ -47,14 +47,14 @@ namespace King.UI
             dealText = UiKit.Label(
                 "DealText",
                 box,
-                new Vector2(0f, 1f),
-                new Vector2(0f, 1f),
-                new Vector2(18f, -12f),
-                new Vector2(480f, 30f),
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(72f, 18f),
+                new Vector2(120f, 48f),
                 "",
-                26,
-                CardStyle.Gold,
-                TextAnchor.MiddleLeft);
+                56,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
 
             dealText.fontStyle =
                 FontStyle.Bold;
@@ -95,7 +95,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(254f, -104f),
+                new Vector2(72f, -112f),
                 new Vector2(92f, 92f));
 
             contractIcon =
@@ -111,7 +111,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(254f, -104f),
+                new Vector2(72f, -112f),
                 new Vector2(92f, 92f),
                 "",
                 72,
@@ -126,8 +126,8 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(246f, 13f),
-                new Vector2(320f, 48f),
+                new Vector2(18f, 13f),
+                new Vector2(550f, 48f),
                 "",
                 34,
                 CardStyle.Gold,
@@ -172,8 +172,18 @@ namespace King.UI
                     ? sections[1].Trim()
                     : "";
 
-            dealText.text =
-                dealPart.ToUpperInvariant();
+            if (dealPart.StartsWith(
+                "El ",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                dealText.text =
+                    dealPart.Substring(3).Trim();
+            }
+            else
+            {
+                dealText.text =
+                    dealPart;
+            }
 
             int colon =
                 contractPart.IndexOf((char)58);
@@ -196,7 +206,8 @@ namespace King.UI
                 contractPart.Substring(
                     colon + 1).Trim();
 
-            callerText.text = caller;
+            callerText.text = "";
+            separatorText.text = "";
 
             if (contract.IndexOf(
                 "Koz",
@@ -262,8 +273,7 @@ namespace King.UI
         {
             trumpGlyph.gameObject.SetActive(false);
 
-            contractText.text =
-                contract;
+            contractText.text = "";
 
             contractText.color =
                 PenaltyColor;
@@ -319,7 +329,7 @@ namespace King.UI
             else if (contract.Contains("♠"))
                 path = "StatusIcons/trump_spades";
 
-            contractText.text = "Koz";
+            contractText.text = "";
             contractText.color = TrumpColor;
 
             if (string.IsNullOrEmpty(path))

@@ -126,6 +126,17 @@ namespace King.UI
             }
         }
 
+        public void MarkCaller(Seat caller)
+        {
+            string gold = ColorUtility.ToHtmlStringRGB(CardStyle.Gold);
+
+            for (int s = 0; s < 4; s++)
+            {
+                string name = GameText.SeatLabel((Seat)s);
+                labels[s].text = s == (int)caller ? name + "  <color=#" + gold + "><size=72>★</size></color>" : name;
+            }
+        }
+
         public void MarkTurn(Seat? seat)
         {
             for (int s = 0; s < 4; s++)
