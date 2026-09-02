@@ -9,8 +9,20 @@ namespace King.UI
         static readonly Color PanelColor =
             new Color(0.025f, 0.085f, 0.05f, 0.98f);
 
-        static readonly Color CellColor =
-            new Color(0.93f, 0.91f, 0.84f, 1f);
+        static readonly Color HeaderColor =
+            new Color(0.075f, 0.14f, 0.095f, 1f);
+
+        static readonly Color RowColorA =
+            new Color(0.055f, 0.105f, 0.075f, 0.96f);
+
+        static readonly Color RowColorB =
+            new Color(0.075f, 0.125f, 0.09f, 0.96f);
+
+        static readonly Color BlackSuitColor =
+            new Color(0.88f, 0.90f, 0.84f, 1f);
+
+        static readonly Color RedSuitColor =
+            new Color(0.88f, 0.34f, 0.34f, 1f);
 
         readonly GameObject panel;
 
@@ -19,6 +31,19 @@ namespace King.UI
 
         readonly CanvasGroup[] groups =
             new CanvasGroup[52];
+
+        static Color DisplaySuitColor(Suit suit)
+        {
+            Color ink = CardStyle.Ink(suit);
+
+            bool isRed =
+                ink.r > 0.35f &&
+                ink.r > ink.g * 1.2f;
+
+            return isRed
+                ? RedSuitColor
+                : BlackSuitColor;
+        }
 
         public RemainingCardsPanel(Transform canvas)
         {
@@ -56,7 +81,7 @@ namespace King.UI
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 40f),
-                new Vector2(1180f, 370f));
+                new Vector2(1180f, 390f));
 
             var background =
                 UiKit.RoundedImage(
@@ -64,7 +89,6 @@ namespace King.UI
                     PanelColor);
 
             background.raycastTarget = true;
-
             panel = panelRect.gameObject;
 
             var cornerLogo =
@@ -85,34 +109,79 @@ namespace King.UI
                 new Vector2(0.5f, 1f),
                 new Vector2(0.5f, 1f),
                 new Vector2(0f, -18f),
-                new Vector2(1100f, 42f),
+                new Vector2(1000f, 40f),
                 "Elde Kalan Kartlar",
-                30,
+                28,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
 
-            title.fontStyle = FontStyle.Bold;
+            title.fontStyle =
+                FontStyle.Bold;
+
+            // Sol üst köşe başlığı.
+            MakeCell(
+                panelRect,
+                new Vector2(24f, -72f),
+                new Vector2(76f, 42f),
+                "Tür",
+                18,
+                CardStyle.Gold,
+                HeaderColor);
+
+            // A - 2 sütun başlıkları.
+            for (int r = (int)Rank.Ace;
+                 r >= (int)Rank.Two;
+                 r--)
+            {
+                int column =
+                    (int)Rank.Ace - r;
+
+                float x =
+                    104f + column * 80f;
+
+                var rank =
+                    (Rank)r;
+
+                var header =
+                    MakeCell(
+                        panelRect,
+                        new Vector2(x, -72f),
+                        new Vector2(76f, 42f),
+                        CardStyle.RankGlyph(rank),
+                        21,
+                        CardStyle.Cream,
+                        HeaderColor);
+
+                header.fontStyle =
+                    FontStyle.Bold;
+            }
 
             int index = 0;
 
-            for (int s = 0; s < 4; s++)
+            for (int s = 0;
+                 s < 4;
+                 s++)
             {
-                var suit = (Suit)s;
+                var suit =
+                    (Suit)s;
 
                 float y =
-                    -82f - s * 66f;
+                    -120f - s * 58f;
 
-                var suitLabel = UiKit.Label(
-                    "Suit",
-                    panelRect,
-                    new Vector2(0f, 1f),
-                    new Vector2(0f, 1f),
-                    new Vector2(42f, y),
-                    new Vector2(50f, 50f),
-                    CardStyle.SuitGlyph(suit),
-                    38,
-                    CardStyle.Ink(suit),
-                    TextAnchor.MiddleCenter);
+                Color rowColor =
+                    s % 2 == 0
+                        ? RowColorA
+                        : RowColorB;
+
+                var suitLabel =
+                    MakeCell(
+                        panelRect,
+                        new Vector2(24f, y),
+                        new Vector2(76f, 52f),
+                        CardStyle.SuitGlyph(suit),
+                        34,
+                        DisplaySuitColor(suit),
+                        rowColor);
 
                 suitLabel.fontStyle =
                     FontStyle.Bold;
@@ -122,13 +191,18 @@ namespace King.UI
                      r--)
                 {
                     var card =
-                        new Card(suit, (Rank)r);
+                        new Card(
+                            suit,
+                            (Rank)r);
 
-                    cards[index] = card;
+                    cards[index] =
+                        card;
+
+                    int column =
+                        (int)Rank.Ace - r;
 
                     float x =
-                        100f +
-                        ((int)Rank.Ace - r) * 80f;
+                        104f + column * 80f;
 
                     var cell = UiKit.Rect(
                         "Card_" + card,
@@ -136,28 +210,36 @@ namespace King.UI
                         new Vector2(0f, 1f),
                         new Vector2(0f, 1f),
                         new Vector2(x, y),
-                        new Vector2(70f, 50f));
+                        new Vector2(76f, 52f));
 
-                    UiKit.RoundedImage(
-                        cell,
-                        CellColor);
+                    var image =
+                        cell.gameObject
+                            .AddComponent<Image>();
+
+                    image.color =
+                        rowColor;
+
+                    image.raycastTarget =
+                        false;
 
                     groups[index] =
                         cell.gameObject
                             .AddComponent<CanvasGroup>();
 
-                    var label = UiKit.Label(
-                        "Label",
-                        cell,
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        Vector2.zero,
-                        new Vector2(66f, 46f),
-                        CardStyle.RankGlyph(card.Rank)
-                            + CardStyle.SuitGlyph(card.Suit),
-                        23,
-                        CardStyle.Ink(card.Suit),
-                        TextAnchor.MiddleCenter);
+                    var label =
+                        UiKit.Label(
+                            "Label",
+                            cell,
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0.5f, 0.5f),
+                            Vector2.zero,
+                            new Vector2(70f, 48f),
+                            CardStyle.RankGlyph(
+                                card.Rank),
+                            22,
+                            DisplaySuitColor(
+                                card.Suit),
+                            TextAnchor.MiddleCenter);
 
                     label.fontStyle =
                         FontStyle.Bold;
@@ -168,7 +250,9 @@ namespace King.UI
 
             toggle.onClick.AddListener(() =>
             {
-                bool show = !panel.activeSelf;
+                bool show =
+                    !panel.activeSelf;
+
                 panel.SetActive(show);
                 cornerLogo.SetActive(show);
             });
@@ -177,6 +261,46 @@ namespace King.UI
             cornerLogo.SetActive(false);
 
             ResetForNewDeal();
+        }
+
+        static Text MakeCell(
+            RectTransform parent,
+            Vector2 position,
+            Vector2 size,
+            string text,
+            int fontSize,
+            Color textColor,
+            Color backgroundColor)
+        {
+            var rt = UiKit.Rect(
+                "GridCell",
+                parent,
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                position,
+                size);
+
+            var image =
+                rt.gameObject
+                    .AddComponent<Image>();
+
+            image.color =
+                backgroundColor;
+
+            image.raycastTarget =
+                false;
+
+            return UiKit.Label(
+                "Text",
+                rt,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                size,
+                text,
+                fontSize,
+                textColor,
+                TextAnchor.MiddleCenter);
         }
 
         public void ResetForNewDeal()
@@ -203,7 +327,7 @@ namespace King.UI
                         deal,
                         cards[i])
                     ? 1f
-                    : 0.20f;
+                    : 0.16f;
             }
         }
 

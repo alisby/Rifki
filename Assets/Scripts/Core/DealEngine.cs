@@ -153,6 +153,30 @@ namespace King.Core
                     return trumps;
             }
 
+            // Rıfkı: oyuncu çıkılan renkten yoksa önce Kupa Papazı
+            // atılmak zorundadır. Kupa Papazı elde yoksa, elde herhangi
+            // bir kupa varsa kupa atmak zorunludur.
+            if (Contract.Type == ContractType.KingOfHearts)
+            {
+                var rifki = hand
+                    .Where(c =>
+                        c.Suit == Suit.Hearts &&
+                        c.Rank == Rank.King)
+                    .ToList();
+
+                if (rifki.Count > 0)
+                    return rifki;
+
+                var hearts = hand
+                    .Where(c => c.Suit == Suit.Hearts)
+                    .ToList();
+
+                if (hearts.Count > 0)
+                    return hearts;
+
+                return new List<Card>(hand);
+            }
+
             var dumps = hand.Where(IsPenaltyCard).ToList();
             if (dumps.Count > 0)
                 return dumps;

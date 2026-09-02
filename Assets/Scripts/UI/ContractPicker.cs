@@ -52,8 +52,8 @@ namespace King.UI
                 overlay.transform,
                 Half,
                 Half,
-                new Vector2(0f, 65f),
-                new Vector2(640f, 670f));
+                new Vector2(0f, 55f),
+                new Vector2(640f, 690f));
 
             UiKit.RoundedImage(
                 panel,

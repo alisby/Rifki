@@ -74,7 +74,7 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                Vector2.zero,
+                new Vector2(0f, 48f),
                 new Vector2(
                     FeltSize,
                     FeltSize));

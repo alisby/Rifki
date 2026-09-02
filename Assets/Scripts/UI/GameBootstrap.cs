@@ -203,7 +203,7 @@ namespace King.UI
                     // back on the table while it lingers.
                     trickView.ShowCompleted(completed);
                     yield return new WaitForSeconds(
-                        TrickLinger + (deal.IsComplete ? 4f : 0f));
+                        TrickLinger);
                     trickView.Clear();
                     // Clear() resets all four seat labels, so re-mark whoever leads next.
                     trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
