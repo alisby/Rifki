@@ -59,6 +59,16 @@ namespace King.UI
                 panel,
                 new Color(0.07f, 0.19f, 0.11f, 0.98f));
 
+            var contractPickerLogo =
+                RifkiBranding.AddCornerLogo(
+                    panel,
+                    "ContractPickerLogo");
+
+            contractPickerLogo
+                .GetComponent<RectTransform>()
+                .anchoredPosition +=
+                    new Vector2(-132f, 132f);
+
             contractPage = BuildContractPage(panel);
             suitPage = BuildSuitPage(panel);
 

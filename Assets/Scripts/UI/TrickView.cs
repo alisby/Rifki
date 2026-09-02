@@ -49,10 +49,10 @@ namespace King.UI
                 center,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -232f),
-                new Vector2(190f, 34f),
+                new Vector2(0f, -216f),
+                new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.South),
-                30,
+                36,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -62,10 +62,10 @@ namespace King.UI
                 canvas,
                 new Vector2(0f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(135f, 60f),
-                new Vector2(190f, 34f),
+                new Vector2(135f, 76f),
+                new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.West),
-                30,
+                36,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -75,10 +75,10 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 1f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -44f),
-                new Vector2(190f, 34f),
+                new Vector2(0f, -42f),
+                new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.North),
-                30,
+                36,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -88,12 +88,15 @@ namespace King.UI
                 canvas,
                 new Vector2(1f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-135f, 60f),
-                new Vector2(190f, 34f),
+                new Vector2(-135f, 76f),
+                new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.East),
-                30,
+                36,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
+
+            for (int s = 0; s < 4; s++)
+                labels[s].fontStyle = FontStyle.Bold;
         }
 
         public void ShowCurrent(IReadOnlyList<(Seat Seat, Card Card)> plays)

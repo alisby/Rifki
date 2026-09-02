@@ -67,6 +67,18 @@ namespace King.UI
 
             panel = panelRect.gameObject;
 
+            var cornerLogo =
+                RifkiBranding.AddCornerLogo(
+                    panelRect,
+                    "RemainingCardsLogo");
+
+            cornerLogo
+                .GetComponent<RectTransform>()
+                .anchoredPosition +=
+                    new Vector2(-132f, 132f);
+
+            cornerLogo.SetActive(false);
+
             var title = UiKit.Label(
                 "Title",
                 panelRect,
@@ -154,12 +166,15 @@ namespace King.UI
                 }
             }
 
-            toggle.onClick.AddListener(
-                () =>
-                    panel.SetActive(
-                        !panel.activeSelf));
+            toggle.onClick.AddListener(() =>
+            {
+                bool show = !panel.activeSelf;
+                panel.SetActive(show);
+                cornerLogo.SetActive(show);
+            });
 
             panel.SetActive(false);
+            cornerLogo.SetActive(false);
 
             ResetForNewDeal();
         }

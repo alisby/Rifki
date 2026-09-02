@@ -47,11 +47,13 @@ namespace King.UI
             BuildEventSystem();
             canvas = BuildCanvas();
             UiKit.Stretched("Felt", canvas, CardStyle.Felt);
+            RifkiBranding.AddFeltWatermark(canvas);
         }
 
         void Start()
         {
             playerNameScreen = new PlayerNameScreen(canvas, BeginGame);
+            RifkiBranding.ShowSplash(this, canvas);
         }
 
         void BeginGame(string south, string west, string north, string east)

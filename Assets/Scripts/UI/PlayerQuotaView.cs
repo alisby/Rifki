@@ -45,7 +45,7 @@ namespace King.UI
                 canvas,
                 Seat.North,
                 new Vector2(0.5f, 1f),
-                new Vector2(0f, -108f));
+                new Vector2(0f, -122f));
 
             Build(
                 canvas,
@@ -72,7 +72,7 @@ namespace King.UI
                 anchor,
                 new Vector2(0.5f, 0.5f),
                 position,
-                new Vector2(220f, 72f));
+                new Vector2(480f, 82f));
 
             UiKit.RoundedImage(row, QuotaBoxColor);
 
@@ -117,24 +117,30 @@ namespace King.UI
                 row,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-40f, -23f),
-                new Vector2(84f, 32f),
+                new Vector2(-190f, 0f),
+                new Vector2(120f, 72f),
                 "",
-                30,
+                60,
                 PenaltyColor,
                 TextAnchor.MiddleCenter);
+
+            penaltyTaken[(int)seat].fontStyle =
+                FontStyle.Bold;
 
             trumpTaken[(int)seat] = UiKit.Label(
                 "TrumpTaken",
                 row,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(66f, -23f),
-                new Vector2(84f, 32f),
+                new Vector2(190f, 0f),
+                new Vector2(120f, 72f),
                 "",
-                30,
+                60,
                 TrumpColor,
                 TextAnchor.MiddleCenter);
+
+            trumpTaken[(int)seat].fontStyle =
+                FontStyle.Bold;
         }
 
         public void Refresh(Session session)

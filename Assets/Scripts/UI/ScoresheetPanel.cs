@@ -71,9 +71,6 @@ namespace King.UI
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
-            toggle.onClick.AddListener(
-                () => panel.SetActive(!panel.activeSelf));
-
             var panelRect = UiKit.Rect(
                 "Scoresheet",
                 canvas,
@@ -88,6 +85,25 @@ namespace King.UI
 
             background.raycastTarget = true;
             panel = panelRect.gameObject;
+
+            var cornerLogo =
+                RifkiBranding.AddCornerLogo(
+                    panelRect,
+                    "ScoresheetLogo");
+
+            cornerLogo
+                .GetComponent<RectTransform>()
+                .anchoredPosition +=
+                    new Vector2(-132f, 132f);
+
+            cornerLogo.SetActive(false);
+
+            toggle.onClick.AddListener(() =>
+            {
+                bool show = !panel.activeSelf;
+                panel.SetActive(show);
+                cornerLogo.SetActive(show);
+            });
 
             string[] headers =
             {

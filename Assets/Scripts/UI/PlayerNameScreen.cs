@@ -64,6 +64,16 @@ namespace King.UI
                 panel,
                 new Color(0.07f, 0.19f, 0.11f, 0.98f));
 
+            var playerNamesLogo =
+                RifkiBranding.AddCornerLogo(
+                    panel,
+                    "PlayerNamesLogo");
+
+            playerNamesLogo
+                .GetComponent<RectTransform>()
+                .anchoredPosition +=
+                    new Vector2(-132f, 132f);
+
             UiKit.Label(
                 "Title",
                 panel,
