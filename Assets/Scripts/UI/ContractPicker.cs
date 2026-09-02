@@ -52,8 +52,8 @@ namespace King.UI
                 overlay.transform,
                 Half,
                 Half,
-                Vector2.zero,
-                new Vector2(640f, 800f));
+                new Vector2(0f, 65f),
+                new Vector2(640f, 670f));
 
             UiKit.RoundedImage(
                 panel,
@@ -200,7 +200,7 @@ namespace King.UI
                 panel,
                 new Vector2(0.5f, 0f),
                 new Vector2(0.5f, 0f),
-                new Vector2(0f, 16f),
+                new Vector2(0f, 5f),
                 new Vector2(190f, 108f));
 
             int s = (int)Seat.South;

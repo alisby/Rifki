@@ -22,7 +22,7 @@ namespace King.UI
             new Color(0.25f, 0.48f, 0.88f, 1f);
 
         static readonly Color QuotaBoxColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.78f);
+            new Color(0.025f, 0.10f, 0.06f, 0.18f);
 
         const float UsedAlpha = 0.20f;
 
@@ -39,7 +39,7 @@ namespace King.UI
                 canvas,
                 Seat.West,
                 new Vector2(0f, 0.5f),
-                new Vector2(135f, -4f));
+                new Vector2(250f, -4f));
 
             Build(
                 canvas,
@@ -51,7 +51,7 @@ namespace King.UI
                 canvas,
                 Seat.East,
                 new Vector2(1f, 0.5f),
-                new Vector2(-135f, -4f));
+                new Vector2(-250f, -4f));
         }
 
         static Color Alpha(Color color, float alpha)
@@ -89,7 +89,7 @@ namespace King.UI
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
-                    new Vector2(x[i], 13f),
+                    new Vector2(x[i], 0f),
                     new Vector2(34f, 36f),
                     "●",
                     34,
@@ -104,7 +104,7 @@ namespace King.UI
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
-                    new Vector2(x[3 + i], 13f),
+                    new Vector2(x[3 + i], 0f),
                     new Vector2(34f, 36f),
                     "▲",
                     32,

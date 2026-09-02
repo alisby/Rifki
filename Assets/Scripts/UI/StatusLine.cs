@@ -4,13 +4,12 @@ using UnityEngine.UI;
 
 namespace King.UI
 {
-    // Three compact status boxes in the top-left corner:
-    // deal number, contract and whose turn.
+    // Two compact status boxes in the top-left corner:
+    // deal number and contract.
     public sealed class StatusLine
     {
         readonly Text dealText;
         readonly Text contractText;
-        readonly Text turnText;
 
         static readonly Color BoxColor =
             new Color(0.025f, 0.10f, 0.06f, 0.88f);
@@ -31,13 +30,6 @@ namespace King.UI
                 canvas,
                 "ContractStatus",
                 new Vector2(18f, -80f));
-
-            turnText = MakeBox(
-                canvas,
-                "TurnStatus",
-                new Vector2(18f, -142f));
-
-            turnText.color = CardStyle.Gold;
         }
 
         static Text MakeBox(
@@ -74,14 +66,11 @@ namespace King.UI
             {
                 dealText.text = "";
                 contractText.text = "";
-                turnText.text = "";
                 return;
             }
 
             string input = value.Trim();
 
-            // GameBootstrap separates the three status sections
-            // with multiple spaces.
             string[] sections = input.Split(
                 new[] { "  " },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -92,56 +81,50 @@ namespace King.UI
             string contractPart =
                 sections.Length > 1 ? sections[1].Trim() : "";
 
-            string turnPart =
-                sections.Length > 2 ? sections[2].Trim() : "";
-
             if (dealPart.StartsWith(
                 "El ",
                 StringComparison.OrdinalIgnoreCase))
             {
-                dealText.text = dealPart.Substring(3).Trim();
+                dealText.text =
+                    dealPart.Substring(3).Trim();
             }
             else
             {
                 dealText.text = dealPart;
             }
 
-            int colon = contractPart.IndexOf((char)58);
-            if (colon >= 0 && colon < contractPart.Length - 1)
-            {
-                string caller = contractPart.Substring(0, colon + 1);
-                string contract = contractPart.Substring(colon + 1).Trim();
+            int colon =
+                contractPart.IndexOf((char)58);
 
-                string gold = ColorUtility.ToHtmlStringRGB(CardStyle.Gold);
+            if (colon >= 0 &&
+                colon < contractPart.Length - 1)
+            {
+                string caller =
+                    contractPart.Substring(
+                        0,
+                        colon + 1);
+
+                string contract =
+                    contractPart.Substring(
+                        colon + 1).Trim();
+
+                string gold =
+                    ColorUtility.ToHtmlStringRGB(
+                        CardStyle.Gold);
+
                 contractText.text =
-                    caller + " <color=#" + gold + ">" +
-                    contract + "</color>";
+                    caller +
+                    " <color=#" +
+                    gold +
+                    ">" +
+                    contract +
+                    "</color>";
             }
             else
             {
-                contractText.text = contractPart;
-            }
-
-            if (turnPart.Equals(
-                "sıra sizde",
-                StringComparison.OrdinalIgnoreCase))
-            {
-                turnText.text = "Sıra sizde!";
-                turnText.color = CardStyle.Gold;
-            }
-            else if (!string.IsNullOrEmpty(turnPart))
-            {
-                turnText.text =
-                    char.ToUpper(turnPart[0]) +
-                    turnPart.Substring(1);
-                turnText.color = CardStyle.Cream;
-            }
-            else
-            {
-                turnText.text = "";
-                turnText.color = CardStyle.Cream;
+                contractText.text =
+                    contractPart;
             }
         }
-
     }
 }
