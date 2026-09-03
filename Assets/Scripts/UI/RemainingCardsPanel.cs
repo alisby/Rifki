@@ -120,12 +120,20 @@ namespace King.UI
 
             int index = 0;
 
+            var suitOrder = new[]
+            {
+                Suit.Clubs,
+                Suit.Diamonds,
+                Suit.Spades,
+                Suit.Hearts
+            };
+
             for (int s = 0;
                  s < 4;
                  s++)
             {
                 var suit =
-                    (Suit)s;
+                    suitOrder[s];
 
                 float y =
                     -72f - s * 58f;
