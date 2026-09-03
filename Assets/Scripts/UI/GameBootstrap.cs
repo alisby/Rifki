@@ -73,6 +73,7 @@ namespace King.UI
             statusLine = new StatusLine(canvas);
             gameProgress = new GameProgressPanel(canvas);
             playerQuota = new PlayerQuotaView(canvas);
+            BuildNewGameButton();
 
             // Creation order is draw order: the sheet sits over the table,
             // notices over the sheet, and the modals over everything.
@@ -394,6 +395,34 @@ namespace King.UI
                 : deal.ToPlay == Seat.South ? "sıra sizde"
                 : GameText.SeatLabel(deal.ToPlay) + " oynayacak";
             return $"El {session.DealNumber}/{Session.DealCount}   {GameText.SeatLabel(session.Caller)}: {GameText.ContractLabel(deal.Contract)}   {turn}";
+        }
+
+        void BuildNewGameButton()
+        {
+            var rect = UiKit.Rect(
+                "NewGameButton",
+                canvas,
+                Vector2.one,
+                Vector2.one,
+                new Vector2(-24f, -130f),
+                new Vector2(150f, 48f));
+
+            var image = UiKit.RoundedImage(
+                rect,
+                new Color(0.05f, 0.14f, 0.08f, 0.92f));
+
+            var button = UiKit.MakeButton(image);
+
+            var label = UiKit.Fill(
+                "Label",
+                rect,
+                "Yeni Oyun",
+                23,
+                CardStyle.Gold,
+                TextAnchor.MiddleCenter);
+
+            label.fontStyle = FontStyle.Bold;
+            button.onClick.AddListener(Restart);
         }
 
         void Restart()
