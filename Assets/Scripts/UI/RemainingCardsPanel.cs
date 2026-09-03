@@ -118,44 +118,6 @@ namespace King.UI
             title.fontStyle =
                 FontStyle.Bold;
 
-            // Sol üst köşe başlığı.
-            MakeCell(
-                panelRect,
-                new Vector2(24f, -72f),
-                new Vector2(76f, 42f),
-                "Tür",
-                18,
-                CardStyle.Gold,
-                HeaderColor);
-
-            // A - 2 sütun başlıkları.
-            for (int r = (int)Rank.Ace;
-                 r >= (int)Rank.Two;
-                 r--)
-            {
-                int column =
-                    (int)Rank.Ace - r;
-
-                float x =
-                    104f + column * 80f;
-
-                var rank =
-                    (Rank)r;
-
-                var header =
-                    MakeCell(
-                        panelRect,
-                        new Vector2(x, -72f),
-                        new Vector2(76f, 42f),
-                        CardStyle.RankGlyph(rank),
-                        21,
-                        CardStyle.Cream,
-                        HeaderColor);
-
-                header.fontStyle =
-                    FontStyle.Bold;
-            }
-
             int index = 0;
 
             for (int s = 0;
@@ -166,7 +128,7 @@ namespace King.UI
                     (Suit)s;
 
                 float y =
-                    -120f - s * 58f;
+                    -72f - s * 58f;
 
                 Color rowColor =
                     s % 2 == 0
