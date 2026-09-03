@@ -38,6 +38,15 @@ namespace King.UI
 
         Transform canvas;
         PlayerNameScreen playerNameScreen;
+        DifficultyDialog difficultyDialog;
+        BotDifficulty difficulty = BotDifficulty.Normal;
+
+        static bool restartPending;
+        static BotDifficulty restartDifficulty = BotDifficulty.Normal;
+        static string restartSouth;
+        static string restartWest;
+        static string restartNorth;
+        static string restartEast;
 
         bool awaitingHuman;
         Card? humanChoice;
@@ -53,6 +62,20 @@ namespace King.UI
 
         void Start()
         {
+            difficultyDialog = new DifficultyDialog(canvas);
+
+            if (restartPending)
+            {
+                restartPending = false;
+                GameText.SetSeatNames(
+                    restartSouth,
+                    restartWest,
+                    restartNorth,
+                    restartEast);
+                StartConfiguredGame(restartDifficulty);
+                return;
+            }
+
             playerNameScreen = new PlayerNameScreen(canvas, BeginGame);
             RifkiBranding.ShowSplash(this, canvas);
         }
@@ -67,6 +90,16 @@ namespace King.UI
                 GameText.SeatLabel(Seat.North),
                 GameText.SeatLabel(Seat.East));
 
+            difficultyDialog.Show(
+                difficulty,
+                false,
+                StartConfiguredGame);
+        }
+
+        void StartConfiguredGame(BotDifficulty selectedDifficulty)
+        {
+            difficulty = selectedDifficulty;
+
             trickView = new TrickView(canvas);
             opponentsView = new OpponentsView(canvas);
             handView = new HandView(canvas, OnCardClicked);
@@ -74,6 +107,7 @@ namespace King.UI
             gameProgress = new GameProgressPanel(canvas);
             playerQuota = new PlayerQuotaView(canvas);
             BuildNewGameButton();
+            new RulesPanel(canvas);
 
             // Creation order is draw order: the sheet sits over the table,
             // notices over the sheet, and the modals over everything.
@@ -82,11 +116,11 @@ namespace King.UI
             banner = new NoticeBanner(canvas);
             picker = new ContractPicker(canvas);
             choiceDialog = new ChoiceDialog(canvas);
-            sessionOver = new SessionOverScreen(canvas, Restart);
+            sessionOver = new SessionOverScreen(canvas, ShowNewGameDialog);
 
             int seed = Environment.TickCount;
             for (int s = 1; s < 4; s++)
-                bots[s] = new HeuristicAgent(seed + s);
+                bots[s] = new HeuristicAgent(seed + s, difficulty);
 
             session = new Session(seed);
             gameProgress.Refresh(session);
@@ -404,7 +438,7 @@ namespace King.UI
                 canvas,
                 Vector2.one,
                 Vector2.one,
-                new Vector2(-24f, -130f),
+                new Vector2(-24f, -14f),
                 new Vector2(150f, 48f));
 
             var image = UiKit.RoundedImage(
@@ -417,18 +451,30 @@ namespace King.UI
                 "Label",
                 rect,
                 "Yeni Oyun",
-                23,
-                CardStyle.Gold,
+                24,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
-            label.fontStyle = FontStyle.Bold;
-            button.onClick.AddListener(Restart);
+            button.onClick.AddListener(ShowNewGameDialog);
         }
 
-        void Restart()
+        void ShowNewGameDialog()
         {
-            // The whole table is rebuilt from code, so a fresh session is just a
-            // scene reload.
+            difficultyDialog.Show(
+                difficulty,
+                true,
+                RestartWithDifficulty);
+        }
+
+        void RestartWithDifficulty(BotDifficulty selectedDifficulty)
+        {
+            restartDifficulty = selectedDifficulty;
+            restartSouth = GameText.SeatLabel(Seat.South);
+            restartWest = GameText.SeatLabel(Seat.West);
+            restartNorth = GameText.SeatLabel(Seat.North);
+            restartEast = GameText.SeatLabel(Seat.East);
+            restartPending = true;
+
             SceneManager.LoadScene(gameObject.scene.buildIndex);
         }
 

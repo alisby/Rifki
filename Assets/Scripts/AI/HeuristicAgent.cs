@@ -19,14 +19,28 @@ namespace King.AI
         const int TrumpThreshold = 18;
 
         readonly Random rng;
+        readonly BotDifficulty difficulty;
 
-        public HeuristicAgent(int seed)
+        public HeuristicAgent(
+            int seed,
+            BotDifficulty difficulty = BotDifficulty.Normal)
         {
             rng = new Random(seed);
+            this.difficulty = difficulty;
         }
 
         public ContractCall ChooseContract(Session session, IReadOnlyList<Card> hand, IReadOnlyList<ContractType> available)
         {
+            if (difficulty == BotDifficulty.Easy)
+            {
+                var easyType = available[rng.Next(available.Count)];
+                return easyType == ContractType.Trump
+                    ? new ContractCall(
+                        ContractType.Trump,
+                        (Suit)rng.Next(4))
+                    : new ContractCall(easyType);
+            }
+
             bool trumpOpen = available.Contains(ContractType.Trump);
             var penalties = available.Where(t => t != ContractType.Trump).ToList();
 
@@ -42,9 +56,171 @@ namespace King.AI
             var legal = deal.LegalPlays();
             if (legal.Count == 1)
                 return legal[0];
+
+            if (difficulty == BotDifficulty.Easy)
+                return legal[rng.Next(legal.Count)];
+
+            if (difficulty == BotDifficulty.Hard)
+                return deal.Contract.Type == ContractType.Trump
+                    ? ChooseHardTrumpCard(deal, seat, legal)
+                    : ChooseHardPenaltyCard(deal, seat, legal);
+
             return deal.Contract.Type == ContractType.Trump
                 ? ChooseTrumpCard(deal, seat, legal)
                 : ChoosePenaltyCard(deal, legal);
+        }
+
+        Card ChooseHardTrumpCard(
+            DealEngine deal,
+            Seat seat,
+            IReadOnlyList<Card> legal)
+        {
+            if (deal.CurrentTrick.Count != 0)
+                return ChooseTrumpCard(deal, seat, legal);
+
+            var trump = deal.Contract.TrumpSuit.Value;
+            var trumps = legal.Where(c => c.Suit == trump).ToList();
+
+            if (trumps.Count > 0
+                && OutstandingTrumps(deal, seat, trump) > 0
+                && HoldsBossTrump(deal, trumps, trump))
+                return Highest(trumps);
+
+            var side = legal.Where(c => c.Suit != trump).ToList();
+            if (side.Count == 0)
+                return Highest(trumps);
+
+            var safeBosses = side
+                .Where(c =>
+                    !CanBeBeatenByUnseen(deal, seat, c)
+                    && KnownVoidCount(deal, seat, c.Suit) == 0)
+                .ToList();
+
+            if (safeBosses.Count > 0)
+                return Highest(safeBosses);
+
+            var saferSuits = side
+                .Where(c => KnownVoidCount(deal, seat, c.Suit) == 0)
+                .ToList();
+
+            if (saferSuits.Count > 0)
+                side = saferSuits;
+
+            var suit = LongestSuit(side);
+            return Lowest(side.Where(c => c.Suit == suit).ToList());
+        }
+
+        Card ChooseHardPenaltyCard(
+            DealEngine deal,
+            Seat seat,
+            IReadOnlyList<Card> legal)
+        {
+            if (deal.CurrentTrick.Count != 0)
+                return ChoosePenaltyCard(deal, legal);
+
+            var mine = deal.HandOf(seat);
+            Card best = legal[0];
+            int bestScore = int.MaxValue;
+
+            foreach (var card in legal)
+            {
+                int suitCount =
+                    mine.Count(c => c.Suit == card.Suit);
+
+                int score =
+                    suitCount * 12 + (int)card.Rank * 2;
+
+                int danger =
+                    DangerScore(deal.Contract.Type, card)
+                    - (int)card.Rank;
+
+                if (danger >= 20)
+                    score += CanBeBeatenByUnseen(
+                        deal, seat, card)
+                        ? -50
+                        : 80;
+
+                if (deal.Contract.Type == ContractType.NoLastTwo
+                    && deal.TrickNumber <= 11)
+                    score -= (int)card.Rank * 4;
+
+                if (score < bestScore)
+                {
+                    bestScore = score;
+                    best = card;
+                }
+            }
+
+            return best;
+        }
+
+        static bool CanBeBeatenByUnseen(
+            DealEngine deal,
+            Seat seat,
+            Card card)
+        {
+            var mine =
+                new HashSet<Card>(deal.HandOf(seat));
+
+            var played = new HashSet<Card>();
+
+            foreach (var trick in deal.History)
+                foreach (var play in trick.Plays)
+                    played.Add(play.Card);
+
+            foreach (var play in deal.CurrentTrick)
+                played.Add(play.Card);
+
+            for (int r = (int)card.Rank + 1;
+                 r <= (int)Rank.Ace;
+                 r++)
+            {
+                var higher =
+                    new Card(card.Suit, (Rank)r);
+
+                if (!mine.Contains(higher)
+                    && !played.Contains(higher))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static int KnownVoidCount(
+            DealEngine deal,
+            Seat me,
+            Suit suit)
+        {
+            int count = 0;
+
+            for (int s = 0; s < 4; s++)
+            {
+                var seat = (Seat)s;
+                if (seat != me
+                    && KnownVoid(deal, seat, suit))
+                    count++;
+            }
+
+            return count;
+        }
+
+        static bool KnownVoid(
+            DealEngine deal,
+            Seat seat,
+            Suit suit)
+        {
+            foreach (var trick in deal.History)
+            {
+                if (trick.Plays[0].Card.Suit != suit)
+                    continue;
+
+                foreach (var play in trick.Plays)
+                    if (play.Seat == seat
+                        && play.Card.Suit != suit)
+                        return true;
+            }
+
+            return false;
         }
 
         Card ChooseTrumpCard(DealEngine deal, Seat seat, IReadOnlyList<Card> legal)
