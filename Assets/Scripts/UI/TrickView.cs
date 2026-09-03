@@ -120,9 +120,9 @@ namespace King.UI
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0f, -40f),
-                    new Vector2(26f, 26f),
+                    new Vector2(52f, 52f),
                     "★",
-                    28,
+                    56,
                     new Color32(255, 201, 43, 255),
                     TextAnchor.MiddleCenter);
 
@@ -131,12 +131,12 @@ namespace King.UI
 
                 var shadow = callerStars[s].gameObject.AddComponent<Shadow>();
                 shadow.effectColor = new Color32(50, 27, 0, 210);
-                shadow.effectDistance = new Vector2(1.5f, -2f);
+                shadow.effectDistance = new Vector2(2.4f, -3.2f);
                 shadow.useGraphicAlpha = true;
 
                 var outline = callerStars[s].gameObject.AddComponent<Outline>();
                 outline.effectColor = new Color32(164, 96, 0, 255);
-                outline.effectDistance = new Vector2(0.8f, -0.8f);
+                outline.effectDistance = new Vector2(1.2f, -1.2f);
                 outline.useGraphicAlpha = true;
 
                 callerStars[s].gameObject.SetActive(false);
