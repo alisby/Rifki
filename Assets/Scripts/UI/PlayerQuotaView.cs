@@ -12,8 +12,7 @@ namespace King.UI
         readonly Text[,] penalty = new Text[4, 3];
         readonly Text[,] trump = new Text[4, 2];
 
-        readonly Text[] penaltyTaken = new Text[4];
-        readonly Text[] trumpTaken = new Text[4];
+        readonly Text[] dealTaken = new Text[4];
 
         static readonly Color PenaltyColor =
             new Color(0.82f, 0.18f, 0.18f, 1f);
@@ -22,7 +21,7 @@ namespace King.UI
             new Color(0.25f, 0.48f, 0.88f, 1f);
 
         static readonly Color QuotaBoxColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.18f);
+            new Color(0.025f, 0.10f, 0.06f, 0.34f);
 
         const float UsedAlpha = 0.20f;
 
@@ -33,7 +32,7 @@ namespace King.UI
                 canvas,
                 Seat.South,
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -258f));
+                new Vector2(0f, -230f));
 
             Build(
                 canvas,
@@ -112,35 +111,31 @@ namespace King.UI
                     TextAnchor.MiddleCenter);
             }
 
-            penaltyTaken[(int)seat] = UiKit.Label(
-                "PenaltyTaken",
+            dealTaken[(int)seat] = UiKit.Label(
+                "DealTaken",
                 row,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-190f, 0f),
-                new Vector2(120f, 72f),
+                new Vector2(-150f, 0f),
+                new Vector2(80f, 72f),
                 "",
-                60,
+                56,
                 PenaltyColor,
                 TextAnchor.MiddleCenter);
 
-            penaltyTaken[(int)seat].fontStyle =
+            dealTaken[(int)seat].fontStyle =
                 FontStyle.Bold;
 
-            trumpTaken[(int)seat] = UiKit.Label(
-                "TrumpTaken",
-                row,
-                new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f),
-                new Vector2(190f, 0f),
-                new Vector2(120f, 72f),
-                "",
-                60,
-                TrumpColor,
-                TextAnchor.MiddleCenter);
+            var countShadow =
+                dealTaken[(int)seat].gameObject.AddComponent<Shadow>();
 
-            trumpTaken[(int)seat].fontStyle =
-                FontStyle.Bold;
+            countShadow.effectColor =
+                new Color(0f, 0f, 0f, 0.65f);
+
+            countShadow.effectDistance =
+                new Vector2(2f, -2f);
+
+            countShadow.useGraphicAlpha = true;
         }
 
         public void Refresh(Session session)
@@ -186,14 +181,11 @@ namespace King.UI
             {
                 int taken = deal.UnitsTaken((Seat)s);
 
-                if (deal.Contract.Type == ContractType.Trump)
-                {
-                    trumpTaken[s].text = taken.ToString();
-                }
-                else
-                {
-                    penaltyTaken[s].text = taken.ToString();
-                }
+                dealTaken[s].text = taken.ToString();
+                dealTaken[s].color =
+                    deal.Contract.Type == ContractType.Trump
+                        ? TrumpColor
+                        : PenaltyColor;
             }
         }
 
@@ -201,8 +193,7 @@ namespace King.UI
         {
             for (int s = 0; s < 4; s++)
             {
-                penaltyTaken[s].text = "";
-                trumpTaken[s].text = "";
+                dealTaken[s].text = "";
             }
         }
     }

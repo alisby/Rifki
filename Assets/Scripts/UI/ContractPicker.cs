@@ -3,9 +3,38 @@ using System.Collections.Generic;
 using King.Core;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace King.UI
 {
+    sealed class ContractHoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+    {
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            transform.localScale = Vector3.one * 1.12f;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            transform.localScale = Vector3.one;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            transform.localScale = Vector3.one * 0.96f;
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            transform.localScale = Vector3.one * 1.12f;
+        }
+
+        void OnDisable()
+        {
+            transform.localScale = Vector3.one;
+        }
+    }
+
     public sealed class ContractPicker
     {
         static readonly Vector2 Half =
@@ -18,7 +47,10 @@ namespace King.UI
         new Color(0.25f, 0.48f, 0.88f, 1f);
 
         static readonly Color QuotaBoxColor =
-        new Color(0.025f, 0.10f, 0.06f, 0.88f);
+            new Color(0.045f, 0.135f, 0.08f, 0.96f);
+
+        static readonly Color QuotaMarkColor =
+            new Color(0.84f, 0.82f, 0.70f, 1f);
 
         static readonly Color PanelColor =
         new Color(0.07f, 0.19f, 0.11f, 0.98f);
@@ -30,16 +62,14 @@ namespace King.UI
         new Color(0.97f, 0.86f, 0.52f, 1f);
 
         static readonly Color SuitTileColor =
-        new Color(0.02f, 0.24f, 0.12f, 1f);
+        new Color(0.045f, 0.135f, 0.08f, 1f);
 
-        static readonly Color PenaltyLeftColor =
-        new Color(0.60f, 0.06f, 0.06f, 1f);
+        static readonly Color PenaltyLeftColor = SuitTileColor;
 
-        static readonly Color PenaltyRightColor =
-        new Color(0.12f, 0.13f, 0.16f, 1f);
+        static readonly Color PenaltyRightColor = SuitTileColor;
 
         const float UsedAlpha = 0.20f;
-        const float DisabledAlpha = 0.35f;
+        const float DisabledAlpha = 0.16f;
 
         readonly GameObject overlay;
         readonly GameObject contractPage;
@@ -199,10 +229,12 @@ namespace King.UI
             rt.gameObject.AddComponent<CanvasGroup>();
 
             var frame =
-            UiKit.RoundedImage(rt, GoldFrameColor);
+            UiKit.RoundedImage(rt, Color.white);
 
             var button =
             UiKit.MakeButton(frame);
+
+            ConfigureButtonVisuals(button);
 
             suitButtons[(int)suit] = button;
 
@@ -274,10 +306,12 @@ namespace King.UI
             rt.gameObject.AddComponent<CanvasGroup>();
 
             var frame =
-            UiKit.RoundedImage(rt, GoldFrameColor);
+            UiKit.RoundedImage(rt, Color.white);
 
             var button =
             UiKit.MakeButton(frame);
+
+            ConfigureButtonVisuals(button);
 
             contractButtons[(int)type] = button;
 
@@ -400,7 +434,7 @@ namespace King.UI
                             new Vector2(28f, 30f),
                             "●",
                             29,
-                            PenaltyColor,
+                            QuotaMarkColor,
                             TextAnchor.MiddleCenter);
             }
 
@@ -416,7 +450,7 @@ namespace King.UI
                             new Vector2(28f, 30f),
                             "▲",
                             27,
-                            TrumpColor,
+                            QuotaMarkColor,
                             TextAnchor.MiddleCenter);
             }
         }
@@ -442,7 +476,7 @@ namespace King.UI
             {
                 penaltyQuota[s, i].color =
                 Alpha(
-                    PenaltyColor,
+                    QuotaMarkColor,
                     i < penaltiesLeft
                     ? 1f
                     : UsedAlpha);
@@ -452,11 +486,38 @@ namespace King.UI
             {
                 trumpQuota[s, i].color =
                 Alpha(
-                    TrumpColor,
+                    QuotaMarkColor,
                     i < trumpsLeft
                     ? 1f
                     : UsedAlpha);
             }
+        }
+
+        void ConfigureButtonVisuals(Button button)
+        {
+            var colors = button.colors;
+
+            colors.normalColor =
+                SuitTileColor;
+
+            colors.highlightedColor =
+                new Color(0.07f, 0.20f, 0.12f, 1f);
+
+            colors.selectedColor =
+                new Color(0.06f, 0.18f, 0.10f, 1f);
+
+            colors.pressedColor =
+                new Color(0.03f, 0.09f, 0.05f, 1f);
+
+            colors.disabledColor =
+                new Color(0.35f, 0.35f, 0.35f, 0.45f);
+
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = 0.04f;
+
+            button.colors = colors;
+
+            button.gameObject.AddComponent<ContractHoverScale>();
         }
 
         void SetVisualState(

@@ -21,7 +21,7 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 20f),
+                new Vector2(0f, 48f),
                 new Vector2(640f, 62f));
             UiKit.RoundedImage(rt, new Color(0.04f, 0.12f, 0.07f, 0.94f));
             text = UiKit.Fill("Text", rt, "", 30, CardStyle.Gold, TextAnchor.MiddleCenter);

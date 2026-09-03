@@ -21,15 +21,15 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 40f),
+                new Vector2(0f, 68f),
                 new Vector2(620f, 480f));
 
             var cardAt = new[]
             {
-                new Vector2(0f, -120f),   // South
-                new Vector2(-200f, 0f),   // West
-                new Vector2(0f, 120f),    // North
-                new Vector2(200f, 0f),    // East
+                new Vector2(0f, -90f),    // South
+                new Vector2(-200f, 30f),  // West
+                new Vector2(0f, 150f),    // North
+                new Vector2(200f, 30f),   // East
             };
 
             for (int s = 0; s < 4; s++)
@@ -50,7 +50,7 @@ namespace King.UI
                 center,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -228f),
+                new Vector2(0f, -210f),
                 new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.South),
                 36,
@@ -99,6 +99,20 @@ namespace King.UI
             for (int s = 0; s < 4; s++)
             {
                 labels[s].fontStyle = FontStyle.Bold;
+                labels[s].resizeTextForBestFit = true;
+                labels[s].resizeTextMinSize = 28;
+                labels[s].resizeTextMaxSize = 38;
+
+                var nameShadow =
+                    labels[s].gameObject.AddComponent<Shadow>();
+
+                nameShadow.effectColor =
+                    new Color(0f, 0f, 0f, 0.70f);
+
+                nameShadow.effectDistance =
+                    new Vector2(1.5f, -1.5f);
+
+                nameShadow.useGraphicAlpha = true;
 
                 callerStars[s] = UiKit.Label(
                     "CallerStar" + s,
