@@ -328,7 +328,6 @@ namespace King.UI
                 scoresheet.Refresh(session);
                 deal = null;
             }
-            statusLine.Set("Oyun bitti");
             sessionOver.Show(session);
         }
 
