@@ -21,17 +21,17 @@ namespace King.UI
             overlay = dim.gameObject;
 
             var panel = UiKit.Rect("Panel", overlay.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, new Vector2(520f, 580f));
+                Vector2.zero, new Vector2(1200f, 580f));
             UiKit.RoundedImage(panel, new Color(0.07f, 0.19f, 0.11f, 0.98f));
 
             UiKit.Label("Title", panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -28f),
-                new Vector2(460f, 44f), "Oyun bitti", 38, CardStyle.Cream, TextAnchor.MiddleCenter);
+                new Vector2(1100f, 44f), "Oyun bitti", 38, CardStyle.Cream, TextAnchor.MiddleCenter);
             winnerLine = UiKit.Label("Winner", panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -86f),
-                new Vector2(460f, 38f), "", 30, CardStyle.Gold, TextAnchor.MiddleCenter);
+                new Vector2(1100f, 44f), "", 30, CardStyle.Gold, TextAnchor.MiddleCenter);
 
             for (int i = 0; i < 4; i++)
                 standings[i] = UiKit.Label("Standing", panel, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                    new Vector2(0f, -160f - i * 64f), new Vector2(380f, 40f), "", 30, CardStyle.Cream, TextAnchor.MiddleCenter);
+                    new Vector2(0f, -160f - i * 64f), new Vector2(900f, 40f), "", 30, CardStyle.Cream, TextAnchor.MiddleCenter);
 
             var buttonRect = UiKit.Rect("Restart", panel, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
                 new Vector2(0f, 36f), new Vector2(230f, 60f));
@@ -43,8 +43,16 @@ namespace King.UI
             overlay.SetActive(false);
         }
 
-        public void Show(IReadOnlyList<int> totals)
+        public void Show(Session session)
         {
+            if (session.RifkiEnded)
+            {
+                ShowRifkiResult(session);
+                return;
+            }
+
+            var totals = session.Totals;
+
             // Best score first; ties break toward the earlier seat since Array.Sort
             // alone makes no ordering promise for equal keys.
             var order = new[] { 0, 1, 2, 3 };
@@ -61,6 +69,30 @@ namespace King.UI
                 standings[i].text = GameText.SeatLabel((Seat)seat) + "   " + totals[seat];
                 standings[i].color = i == 0 ? CardStyle.Gold : CardStyle.Cream;
             }
+            overlay.SetActive(true);
+        }
+
+        void ShowRifkiResult(Session session)
+        {
+            Seat declarer = session.RifkiDeclarer.Value;
+
+            winnerLine.text = session.RifkiSucceeded
+                ? GameText.SeatLabel(declarer) + " Rıfkı yaptı — tek başına çıktı"
+                : GameText.SeatLabel(declarer) + " Rıfkı yapamadı — tek başına battı";
+
+            for (int s = 0; s < 4; s++)
+            {
+                bool isDeclarer = s == (int)declarer;
+                bool outPlayer = session.RifkiSucceeded ? isDeclarer : !isDeclarer;
+
+                standings[s].text =
+                    GameText.SeatLabel((Seat)s)
+                    + (outPlayer ? "   ÇIKTI" : "   BATTI");
+
+                standings[s].color =
+                    outPlayer ? CardStyle.Gold : CardStyle.Cream;
+            }
+
             overlay.SetActive(true);
         }
     }

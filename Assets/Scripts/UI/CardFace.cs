@@ -191,13 +191,13 @@ namespace King.UI
             cornerRank.text = rank;
             cornerRank.color = ink;
 
-            cornerSuit.text = suit;
+            cornerSuit.text = "";
             cornerSuit.color = ink;
 
             bottomRank.text = rank;
             bottomRank.color = ink;
 
-            bottomSuit.text = suit;
+            bottomSuit.text = "";
             bottomSuit.color = ink;
 
             pip.text = suit;

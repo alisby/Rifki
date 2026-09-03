@@ -21,6 +21,9 @@ namespace King.Core
         readonly bool trumpMayBeLedBeforeBroken;
 
         public ContractCall Contract { get; }
+        public Seat Caller { get; }
+        public bool RifkiSucceeded { get; private set; }
+        public bool RifkiFailed { get; private set; }
         public Seat ToPlay { get; private set; }
         public bool IsComplete { get; private set; }
 
@@ -66,6 +69,7 @@ namespace King.Core
             historyView = history.AsReadOnly();
 
             Contract = contract;
+            Caller = leader;
 
             if (contract.TrumpSuit != null)
             {
@@ -142,6 +146,16 @@ namespace King.Core
             var inSuit = hand.Where(c => c.Suit == led).ToList();
             if (inSuit.Count > 0)
             {
+                // Kozla cikilmissa, gecebilen oyuncu kozu yukseltmek zorundadir.
+                if (Contract.TrumpSuit != null && led == Contract.TrumpSuit.Value)
+                {
+                    Rank highestTrump = HighestOnTable(led);
+                    var higherTrumps = inSuit.Where(c => c.Rank > highestTrump).ToList();
+                    if (higherTrumps.Count > 0)
+                        return higherTrumps;
+                    return inSuit;
+                }
+
                 var beaten = inSuit.Where(c => IsPenaltyCard(c) && c.Rank < HighestOnTable(led)).ToList();
                 return beaten.Count > 0 ? beaten : inSuit;
             }
@@ -253,6 +267,23 @@ namespace King.Core
             history.Add(trick);
             currentTrick.Clear();
 
+            if (Contract.RifkiDeclared
+                && winner == Caller
+                && history.Count(t => t.Winner == Caller) >= 10)
+            {
+                RifkiSucceeded = true;
+                IsComplete = true;
+                return trick;
+            }
+
+            if (Contract.RifkiDeclared
+                && history.Count(t => t.Winner != Caller) >= 4)
+            {
+                RifkiFailed = true;
+                IsComplete = true;
+                return trick;
+            }
+
             if (history.Count == 13 || NothingLeftCanScore())
             {
                 IsComplete = true;
@@ -272,6 +303,22 @@ namespace King.Core
                 throw new ArgumentOutOfRangeException(nameof(seat));
 
             return CountUnits()[(int)seat];
+        }
+
+        public bool QueensSplitOneEach
+        {
+            get
+            {
+                if (Contract.Type != ContractType.NoQueens || !IsComplete)
+                    return false;
+
+                var units = CountUnits();
+                for (int s = 0; s < 4; s++)
+                    if (units[s] != 1)
+                        return false;
+
+                return true;
+            }
         }
 
         public DealScore Score()

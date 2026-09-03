@@ -62,7 +62,11 @@ namespace King.Core
                 default: return Seat.South;
             }
         }
-        public bool IsComplete => DealNumber > DealCount;
+        public bool RifkiEnded { get; private set; }
+        public Seat? RifkiDeclarer { get; private set; }
+        public bool RifkiSucceeded { get; private set; }
+
+        public bool IsComplete => RifkiEnded || DealNumber > DealCount;
         public IReadOnlyList<int> Totals => totalsView;
         public IReadOnlyList<ScoreRow> Sheet => sheetView;
 
@@ -156,6 +160,13 @@ namespace King.Core
             return (IReadOnlyList<Card>[])dealtHands.Clone();
         }
 
+        public void RedealUnstarted()
+        {
+            if (pending != null)
+                throw new InvalidOperationException("a deal is already in progress");
+            dealtHands = null;
+        }
+
         public DealEngine StartDeal(ContractCall call)
         {
             if (IsComplete)
@@ -196,6 +207,30 @@ namespace King.Core
             return pending;
         }
 
+        public void CancelDeal()
+        {
+            if (pending == null)
+                throw new InvalidOperationException("no deal has been started");
+
+            int caller = (int)Caller;
+
+            // StartDeal sırasında harcanan kontrat hakkını geri ver.
+            if (pending.Contract.Type == ContractType.Trump)
+            {
+                trumpLeft[caller]++;
+            }
+            else
+            {
+                penaltySlots[caller]++;
+                penaltyLeft[(int)pending.Contract.Type]++;
+            }
+
+            // El numarası ve çağıran değişmez. Bir sonraki DealHands
+            // aynı oyuncu için yeni kart dağıtır.
+            pending = null;
+            dealtHands = null;
+        }
+
         public void FinishDeal()
         {
             if (pending == null)
@@ -211,6 +246,14 @@ namespace King.Core
                 totals[s] += points[s];
             }
             sheet.Add(new ScoreRow(DealNumber, Caller, pending.Contract, points));
+
+            if (pending.Contract.RifkiDeclared)
+            {
+                RifkiEnded = true;
+                RifkiDeclarer = Caller;
+                RifkiSucceeded = pending.RifkiSucceeded;
+            }
+
             pending = null;
             DealNumber++;
         }

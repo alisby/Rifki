@@ -11,6 +11,7 @@ namespace King.UI
         readonly Text contractText;
         readonly Text separatorText;
         readonly Text trumpGlyph;
+        readonly Text rifkiText;
         readonly Image contractIcon;
 
         string currentIconPath;
@@ -49,10 +50,10 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(72f, 18f),
-                new Vector2(120f, 48f),
+                new Vector2(82f, 16f),
+                new Vector2(138f, 56f),
                 "",
-                56,
+                64,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
@@ -95,7 +96,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(72f, -112f),
+                new Vector2(82f, -119f),
                 new Vector2(92f, 92f));
 
             contractIcon =
@@ -111,15 +112,45 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(72f, -112f),
-                new Vector2(92f, 92f),
+                new Vector2(82f, -119f),
+                new Vector2(106f, 106f),
                 "",
-                72,
+                82,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             trumpGlyph.fontStyle =
                 FontStyle.Bold;
+
+            rifkiText = UiKit.Label(
+                "RifkiDeclaration",
+                box,
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(82f, -181f),
+                new Vector2(150f, 42f),
+                "Rıfkı",
+                34,
+                CardStyle.Gold,
+                TextAnchor.MiddleCenter);
+
+            rifkiText.fontStyle = FontStyle.Bold;
+
+            var rifkiShadow =
+                rifkiText.gameObject.AddComponent<Shadow>();
+            rifkiShadow.effectColor =
+                new Color(0.20f, 0.10f, 0f, 0.85f);
+            rifkiShadow.effectDistance =
+                new Vector2(2f, -2f);
+
+            var rifkiGlow =
+                rifkiText.gameObject.AddComponent<Outline>();
+            rifkiGlow.effectColor =
+                new Color(1f, 0.76f, 0.18f, 0.55f);
+            rifkiGlow.effectDistance =
+                new Vector2(1.2f, -1.2f);
+
+            rifkiText.gameObject.SetActive(false);
 
             contractText = UiKit.Label(
                 "Contract",
@@ -142,6 +173,11 @@ namespace King.UI
 
             contractIcon.gameObject.SetActive(false);
             trumpGlyph.gameObject.SetActive(false);
+        }
+
+        public void SetRifkiDeclared(bool declared)
+        {
+            rifkiText.gameObject.SetActive(declared);
         }
 
         public void Set(string value)

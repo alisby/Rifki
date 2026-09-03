@@ -33,6 +33,7 @@ namespace King.UI
         RemainingCardsPanel remainingCards;
         NoticeBanner banner;
         ContractPicker picker;
+        ChoiceDialog choiceDialog;
         SessionOverScreen sessionOver;
 
         Transform canvas;
@@ -79,6 +80,7 @@ namespace King.UI
             remainingCards = new RemainingCardsPanel(canvas);
             banner = new NoticeBanner(canvas);
             picker = new ContractPicker(canvas);
+            choiceDialog = new ChoiceDialog(canvas);
             sessionOver = new SessionOverScreen(canvas, Restart);
 
             int seed = Environment.TickCount;
@@ -124,15 +126,69 @@ namespace King.UI
             return go.transform;
         }
 
+        static bool CanBreakTrumpHand(System.Collections.Generic.IReadOnlyList<Card> hand)
+        {
+            foreach (var card in hand)
+                if (card.Rank == Rank.Jack
+                    || card.Rank == Rank.Queen
+                    || card.Rank == Rank.King
+                    || card.Rank == Rank.Ace)
+                    return false;
+
+            return true;
+        }
+
+        static Seat? FindBotTrumpBreaker(System.Collections.Generic.IReadOnlyList<Card>[] hands)
+        {
+            for (int s = 1; s < 4; s++)
+                if (CanBreakTrumpHand(hands[s]))
+                    return (Seat)s;
+            return null;
+        }
+
+        static bool BotShouldDeclareRifki(System.Collections.Generic.IReadOnlyList<Card> hand, Suit trump)
+        {
+            int trumps = 0;
+            int topTrumps = 0;
+            int outsideAces = 0;
+
+            foreach (var card in hand)
+            {
+                if (card.Suit == trump)
+                {
+                    trumps++;
+                    if (card.Rank >= Rank.Queen)
+                        topTrumps++;
+                }
+                else if (card.Rank == Rank.Ace)
+                {
+                    outsideAces++;
+                }
+            }
+
+            return trumps >= 6
+                && topTrumps >= 2
+                && (trumps >= 7 || outsideAces >= 2);
+        }
+
         IEnumerator RunSession()
         {
+            ContractCall? repeatTrumpCall = null;
+
             while (!session.IsComplete)
             {
                 var hands = session.DealHands();
                 remainingCards.ResetForNewDeal();
                 var available = session.AvailableContracts();
                 ContractCall call;
-                if (session.Caller == Seat.South)
+                if (repeatTrumpCall.HasValue)
+                {
+                    call = repeatTrumpCall.Value;
+                    repeatTrumpCall = null;
+                    handView.Show(hands[(int)Seat.South]);
+                    handView.DisableAll();
+                }
+                else if (session.Caller == Seat.South)
                 {
                     // Deal the cards face up first; picking a contract blind would be
                     // a coin toss.
@@ -150,20 +206,130 @@ namespace King.UI
                     int caller = (int)session.Caller;
                     call = bots[caller].ChooseContract(session, hands[caller], available);
                 }
+                if (call.Type == ContractType.Trump)
+                {
+                    Seat? botBreaker = FindBotTrumpBreaker(hands);
+
+                    if (botBreaker.HasValue)
+                    {
+                        handView.Show(hands[(int)Seat.South]);
+
+                        banner.Flash(
+                            this,
+                            GameText.SeatLabel(botBreaker.Value)
+                                + " eli bozdu — koz eli yeniden dağıtılıyor",
+                            2.5f);
+
+                        yield return new WaitForSeconds(2.5f);
+                        session.RedealUnstarted();
+                        repeatTrumpCall = call;
+                        continue;
+                    }
+
+                    if (CanBreakTrumpHand(hands[(int)Seat.South]))
+                    {
+                        handView.Show(hands[(int)Seat.South]);
+                        handView.DisableAll();
+
+                        bool? breakHand = null;
+
+                        choiceDialog.Show(
+                            "Koz Eli",
+                            "Elinizde Vale, Kız, Papaz veya As yok. Eli bozabilirsiniz.",
+                            "Eli Boz",
+                            () => breakHand = true,
+                            "Devam Et",
+                            () => breakHand = false);
+
+                        while (!breakHand.HasValue)
+                            yield return null;
+
+                        if (breakHand.Value)
+                        {
+                            banner.Flash(
+                                this,
+                                GameText.SeatLabel(Seat.South)
+                                    + " eli bozdu — koz eli yeniden dağıtılıyor",
+                                2.5f);
+
+                            yield return new WaitForSeconds(2.5f);
+                            session.RedealUnstarted();
+                            repeatTrumpCall = call;
+                            continue;
+                        }
+                    }
+                }
+
+                if (call.Type == ContractType.Trump)
+                {
+                    bool declareRifki = false;
+
+                    if (session.Caller == Seat.South)
+                    {
+                        bool? choice = null;
+
+                        choiceDialog.Show(
+                            "Rıfkı",
+                            "10 el alarak Rıfkı yapmayı ilan etmek ister misiniz? Başaramazsanız tek başınıza batarsınız.",
+                            "Rıfkı İlan Et",
+                            () => choice = true,
+                            "Normal Oyna",
+                            () => choice = false);
+
+                        while (!choice.HasValue)
+                            yield return null;
+
+                        declareRifki = choice.Value;
+                    }
+                    else
+                    {
+                        int caller = (int)session.Caller;
+                        declareRifki =
+                            BotShouldDeclareRifki(
+                                hands[caller],
+                                call.TrumpSuit.Value);
+                    }
+
+                    if (declareRifki)
+                        call = new ContractCall(
+                            ContractType.Trump,
+                            call.TrumpSuit,
+                            true);
+                }
+
                 deal = session.StartDeal(call);
+                statusLine.SetRifkiDeclared(call.RifkiDeclared);
                 trickView.MarkCaller(session.Caller);
                 remainingCards.Refresh(deal);
                 playerQuota.Refresh(session);
                 playerQuota.RefreshDeal(deal);
                 yield return RunDeal();
+
+                if (deal.QueensSplitOneEach)
+                {
+                    playerQuota.ClearDealCounts();
+                    session.CancelDeal();
+                    playerQuota.Refresh(session);
+
+                    banner.Flash(
+                        this,
+                        "Herkes bir kız aldı — el iptal edildi",
+                        3f);
+
+                    yield return new WaitForSeconds(3f);
+                    deal = null;
+                    continue;
+                }
+
                 playerQuota.ClearDealCounts();
                 session.FinishDeal();
+                playerQuota.Refresh(session);
                 gameProgress.Refresh(session);
                 scoresheet.Refresh(session);
                 deal = null;
             }
             statusLine.Set("Oyun bitti");
-            sessionOver.Show(session.Totals);
+            sessionOver.Show(session);
         }
 
         IEnumerator RunDeal()
@@ -196,7 +362,7 @@ namespace King.UI
                 RefreshTable();
                 if (heartsMatter && !wasBroken && deal.HeartsBroken)
                     banner.Flash(this, "Kupa açıldı", 2f);
-                if (deal.IsComplete && deal.History.Count < 13)
+                if (deal.IsComplete && deal.History.Count < 13 && !deal.QueensSplitOneEach && !deal.RifkiSucceeded && !deal.RifkiFailed)
                     banner.Flash(this, "Puanlanacak kart kalmadı — el erken bitti", 2.5f);
                 if (completed != null)
                 {
