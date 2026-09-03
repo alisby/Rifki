@@ -9,31 +9,61 @@ namespace King.UI
     public sealed class ContractPicker
     {
         static readonly Vector2 Half =
-            new Vector2(0.5f, 0.5f);
+        new Vector2(0.5f, 0.5f);
 
         static readonly Color PenaltyColor =
-            new Color(0.82f, 0.18f, 0.18f, 1f);
+        new Color(0.82f, 0.18f, 0.18f, 1f);
 
         static readonly Color TrumpColor =
-            new Color(0.25f, 0.48f, 0.88f, 1f);
+        new Color(0.25f, 0.48f, 0.88f, 1f);
 
         static readonly Color QuotaBoxColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.88f);
+        new Color(0.025f, 0.10f, 0.06f, 0.88f);
+
+        static readonly Color PanelColor =
+        new Color(0.07f, 0.19f, 0.11f, 0.98f);
+
+        static readonly Color GoldFrameColor =
+        new Color(0.88f, 0.70f, 0.28f, 1f);
+
+        static readonly Color GoldTextColor =
+        new Color(0.97f, 0.86f, 0.52f, 1f);
+
+        static readonly Color SuitTileColor =
+        new Color(0.02f, 0.24f, 0.12f, 1f);
+
+        static readonly Color PenaltyLeftColor =
+        new Color(0.60f, 0.06f, 0.06f, 1f);
+
+        static readonly Color PenaltyRightColor =
+        new Color(0.12f, 0.13f, 0.16f, 1f);
 
         const float UsedAlpha = 0.20f;
+        const float DisabledAlpha = 0.35f;
 
         readonly GameObject overlay;
         readonly GameObject contractPage;
-        readonly GameObject suitPage;
 
         readonly Button[] contractButtons =
-            new Button[7];
+        new Button[7];
+
+        readonly Button[] suitButtons =
+        new Button[4];
+
+        readonly CanvasGroup[] contractGroups =
+        new CanvasGroup[7];
+
+        readonly CanvasGroup[] suitGroups =
+        new CanvasGroup[4];
 
         readonly Text[,] penaltyQuota =
-            new Text[4, 3];
+        new Text[4, 3];
 
         readonly Text[,] trumpQuota =
-            new Text[4, 2];
+        new Text[4, 2];
+
+        readonly Dictionary<string, Sprite> spriteCache =
+        new Dictionary<string, Sprite>();
 
         Action<ContractCall> onChosen;
 
@@ -53,24 +83,21 @@ namespace King.UI
                 Half,
                 Half,
                 new Vector2(0f, 55f),
-                new Vector2(640f, 690f));
+                                   new Vector2(700f, 690f));
 
-            UiKit.RoundedImage(
-                panel,
-                new Color(0.07f, 0.19f, 0.11f, 0.98f));
+            UiKit.RoundedImage(panel, PanelColor);
 
             var contractPickerLogo =
-                RifkiBranding.AddCornerLogo(
-                    panel,
-                    "ContractPickerLogo");
+            RifkiBranding.AddCornerLogo(
+                panel,
+                "ContractPickerLogo");
 
             contractPickerLogo
-                .GetComponent<RectTransform>()
-                .anchoredPosition +=
-                    new Vector2(-132f, 132f);
+            .GetComponent<RectTransform>()
+            .anchoredPosition +=
+            new Vector2(-148f, 134f);
 
             contractPage = BuildContractPage(panel);
-            suitPage = BuildSuitPage(panel);
 
             BuildQuotaBar(panel);
 
@@ -91,106 +118,231 @@ namespace King.UI
                 "Title",
                 page,
                 new Vector2(0.5f, 1f),
+                        new Vector2(0.5f, 1f),
+                        new Vector2(0f, -26f),
+                        new Vector2(560f, 42f),
+                        "Kontratı seçin",
+                        34,
+                        CardStyle.Cream,
+                        TextAnchor.MiddleCenter);
+
+            UiKit.Label(
+                "Subtitle",
+                page,
                 new Vector2(0.5f, 1f),
-                new Vector2(0f, -24f),
-                new Vector2(520f, 42f),
-                "Kontratı seçin",
-                34,
-                CardStyle.Cream,
-                TextAnchor.MiddleCenter);
+                        new Vector2(0.5f, 1f),
+                        new Vector2(0f, -62f),
+                        new Vector2(600f, 28f),
+                        "Üstte koz, altta ceza kontratları",
+                        20,
+                        GoldTextColor,
+                        TextAnchor.MiddleCenter);
 
-            for (int i = 0; i < 7; i++)
+            float[] suitX =
             {
-                var type = (ContractType)i;
+                -228f, -76f, 76f, 228f
+            };
 
-                var button = MenuButton(
+            for (int i = 0; i < 4; i++)
+                BuildTrumpButton(
                     page,
-                    new Vector2(0.5f, 1f),
-                    new Vector2(0f, -96f - i * 68f),
-                    new Vector2(440f, 56f),
-                    GameText.ContractLabel(type),
-                    27,
-                    CardStyle.BlackInk);
+                    (Suit)i,
+                                 new Vector2(suitX[i], -120f));
 
-                button.onClick.AddListener(() =>
-                {
-                    if (type == ContractType.Trump)
-                    {
-                        contractPage.SetActive(false);
-                        suitPage.SetActive(true);
-                    }
-                    else
-                    {
-                        Choose(new ContractCall(type));
-                    }
-                });
+                BuildPenaltyCard(
+                    page,
+                    ContractType.NoTricks,
+                    new Vector2(-152f, -260f));
 
-                contractButtons[i] = button;
-            }
+                BuildPenaltyCard(
+                    page,
+                    ContractType.NoHearts,
+                    new Vector2(152f, -260f));
 
-            return page.gameObject;
+                BuildPenaltyCard(
+                    page,
+                    ContractType.NoMen,
+                    new Vector2(-152f, -360f));
+
+                BuildPenaltyCard(
+                    page,
+                    ContractType.NoQueens,
+                    new Vector2(152f, -360f));
+
+                BuildPenaltyCard(
+                    page,
+                    ContractType.KingOfHearts,
+                    new Vector2(-152f, -460f));
+
+                BuildPenaltyCard(
+                    page,
+                    ContractType.NoLastTwo,
+                    new Vector2(152f, -460f));
+
+                return page.gameObject;
         }
 
-        GameObject BuildSuitPage(RectTransform panel)
+        void BuildTrumpButton(
+            RectTransform page,
+            Suit suit,
+            Vector2 position)
         {
-            var page = UiKit.Rect(
-                "TrumpSuit",
-                panel,
+            var rt = UiKit.Rect(
+                "Trump" + suit,
+                page,
+                new Vector2(0.5f, 1f),
+                                new Vector2(0.5f, 1f),
+                                position,
+                                new Vector2(122f, 122f));
+
+            suitGroups[(int)suit] =
+            rt.gameObject.AddComponent<CanvasGroup>();
+
+            var frame =
+            UiKit.RoundedImage(rt, GoldFrameColor);
+
+            var button =
+            UiKit.MakeButton(frame);
+
+            suitButtons[(int)suit] = button;
+
+            var inner = UiKit.Rect(
+                "Inner",
+                rt,
                 Half,
                 Half,
                 Vector2.zero,
-                panel.sizeDelta);
+                new Vector2(108f, 108f));
 
-            UiKit.Label(
-                "Title",
-                page,
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -30f),
-                new Vector2(520f, 42f),
-                "Koz rengini seçin",
-                34,
-                CardStyle.Cream,
-                TextAnchor.MiddleCenter);
+            var innerBg =
+            UiKit.RoundedImage(inner, SuitTileColor);
 
-            for (int i = 0; i < 4; i++)
-            {
-                var suit = (Suit)i;
+            innerBg.raycastTarget = false;
 
-                var button = MenuButton(
-                    page,
-                    Half,
-                    new Vector2(-180f + i * 120f, 70f),
-                    new Vector2(100f, 120f),
-                    CardStyle.SuitGlyph(suit),
-                    60,
-                    CardStyle.Ink(suit));
-
-                button.onClick.AddListener(
-                    () => Choose(
-                        new ContractCall(
-                            ContractType.Trump,
-                            suit)));
-            }
-
-            var back = MenuButton(
-                page,
+            var iconHolder = UiKit.Rect(
+                "Icon",
+                inner,
                 Half,
-                new Vector2(0f, -80f),
-                new Vector2(220f, 58f),
-                "Geri",
-                26,
-                CardStyle.BlackInk);
+                Half,
+                new Vector2(0f, -4f),
+                                        new Vector2(66f, 66f));
 
-            back.onClick.AddListener(() =>
-            {
-                suitPage.SetActive(false);
-                contractPage.SetActive(true);
-            });
+            var icon =
+            iconHolder.gameObject.AddComponent<Image>();
 
-            page.gameObject.SetActive(false);
+            icon.sprite = LoadSprite(TrumpIconPath(suit));
+            icon.color = Color.white;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
 
-            return page.gameObject;
+            var label = UiKit.Label(
+                "Label",
+                inner,
+                new Vector2(0.5f, 0f),
+                                    new Vector2(0.5f, 0f),
+                                    new Vector2(0f, 11f),
+                                    new Vector2(90f, 18f),
+                                    "KOZ",
+                                    16,
+                                    GoldTextColor,
+                                    TextAnchor.MiddleCenter);
+
+            label.fontStyle = FontStyle.Bold;
+            label.raycastTarget = false;
+
+            button.onClick.AddListener(
+                () => Choose(
+                    new ContractCall(
+                        ContractType.Trump,
+                        suit)));
+        }
+
+        void BuildPenaltyCard(
+            RectTransform page,
+            ContractType type,
+            Vector2 position)
+        {
+            var rt = UiKit.Rect(
+                "Penalty" + type,
+                page,
+                new Vector2(0.5f, 1f),
+                                new Vector2(0.5f, 1f),
+                                position,
+                                new Vector2(274f, 94f));
+
+            contractGroups[(int)type] =
+            rt.gameObject.AddComponent<CanvasGroup>();
+
+            var frame =
+            UiKit.RoundedImage(rt, GoldFrameColor);
+
+            var button =
+            UiKit.MakeButton(frame);
+
+            contractButtons[(int)type] = button;
+
+            var left = UiKit.Rect(
+                "Left",
+                rt,
+                Half,
+                Half,
+                new Vector2(-82f, 0f),
+                                  new Vector2(88f, 80f));
+
+            var leftBg =
+            UiKit.RoundedImage(left, PenaltyRightColor);
+
+            leftBg.raycastTarget = false;
+
+            var right = UiKit.Rect(
+                "Right",
+                rt,
+                Half,
+                Half,
+                new Vector2(47f, 0f),
+                                   new Vector2(162f, 80f));
+
+            var rightBg =
+            UiKit.RoundedImage(right, PenaltyRightColor);
+
+            rightBg.raycastTarget = false;
+
+            var iconHolder = UiKit.Rect(
+                "Icon",
+                left,
+                Half,
+                Half,
+                Vector2.zero,
+                new Vector2(56f, 56f));
+
+            var icon =
+            iconHolder.gameObject.AddComponent<Image>();
+
+            icon.sprite = LoadSprite(PenaltyIconPath(type));
+            icon.color = Color.white;
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+
+            var label = UiKit.Label(
+                "Label",
+                right,
+                Half,
+                Half,
+                Vector2.zero,
+                new Vector2(140f, 66f),
+                                    PenaltyButtonLabel(type),
+                                    22,
+                                    GoldTextColor,
+                                    TextAnchor.MiddleLeft);
+
+            label.fontStyle = FontStyle.Bold;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 17;
+            label.resizeTextMaxSize = 24;
+            label.raycastTarget = false;
+
+            button.onClick.AddListener(
+                () => Choose(new ContractCall(type)));
         }
 
         void BuildQuotaBar(RectTransform panel)
@@ -199,9 +351,9 @@ namespace King.UI
                 "QuotaBar",
                 panel,
                 new Vector2(0.5f, 0f),
-                new Vector2(0.5f, 0f),
-                new Vector2(0f, 5f),
-                new Vector2(190f, 108f));
+                                 new Vector2(0.5f, 0f),
+                                 new Vector2(0f, 5f),
+                                 new Vector2(190f, 108f));
 
             int s = (int)Seat.South;
             var seat = Seat.South;
@@ -210,9 +362,9 @@ namespace King.UI
                 "SouthPickerQuota",
                 bar,
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f),
-                Vector2.zero,
-                new Vector2(180f, 96f));
+                                 new Vector2(0.5f, 0.5f),
+                                 Vector2.zero,
+                                 new Vector2(180f, 96f));
 
             UiKit.RoundedImage(box, QuotaBoxColor);
 
@@ -220,13 +372,13 @@ namespace King.UI
                 "Name",
                 box,
                 new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -8f),
-                new Vector2(170f, 28f),
-                GameText.SeatLabel(seat),
-                24,
-                CardStyle.Cream,
-                TextAnchor.MiddleCenter);
+                                   new Vector2(0.5f, 1f),
+                                   new Vector2(0f, -8f),
+                                   new Vector2(170f, 28f),
+                                   GameText.SeatLabel(seat),
+                                   24,
+                                   CardStyle.Cream,
+                                   TextAnchor.MiddleCenter);
 
             name.fontStyle = FontStyle.Bold;
 
@@ -239,33 +391,33 @@ namespace King.UI
             for (int i = 0; i < 3; i++)
             {
                 penaltyQuota[s, i] =
-                    UiKit.Label(
-                        "Penalty" + i,
-                        box,
-                        Half,
-                        Half,
-                        new Vector2(x[i], -13f),
-                        new Vector2(28f, 30f),
-                        "●",
-                        29,
-                        PenaltyColor,
-                        TextAnchor.MiddleCenter);
+                UiKit.Label(
+                    "Penalty" + i,
+                    box,
+                    Half,
+                    Half,
+                    new Vector2(x[i], -13f),
+                            new Vector2(28f, 30f),
+                            "●",
+                            29,
+                            PenaltyColor,
+                            TextAnchor.MiddleCenter);
             }
 
             for (int i = 0; i < 2; i++)
             {
                 trumpQuota[s, i] =
-                    UiKit.Label(
-                        "Trump" + i,
-                        box,
-                        Half,
-                        Half,
-                        new Vector2(x[3 + i], -13f),
-                        new Vector2(28f, 30f),
-                        "▲",
-                        27,
-                        TrumpColor,
-                        TextAnchor.MiddleCenter);
+                UiKit.Label(
+                    "Trump" + i,
+                    box,
+                    Half,
+                    Half,
+                    new Vector2(x[3 + i], -13f),
+                            new Vector2(28f, 30f),
+                            "▲",
+                            27,
+                            TrumpColor,
+                            TextAnchor.MiddleCenter);
             }
         }
 
@@ -281,64 +433,134 @@ namespace King.UI
             var seat = Seat.South;
 
             int penaltiesLeft =
-                session.PenaltySlotsLeft(seat);
+            session.PenaltySlotsLeft(seat);
 
             int trumpsLeft =
-                session.TrumpCallsLeft(seat);
+            session.TrumpCallsLeft(seat);
 
             for (int i = 0; i < 3; i++)
             {
                 penaltyQuota[s, i].color =
-                    Alpha(
-                        PenaltyColor,
-                        i < penaltiesLeft
-                            ? 1f
-                            : UsedAlpha);
+                Alpha(
+                    PenaltyColor,
+                    i < penaltiesLeft
+                    ? 1f
+                    : UsedAlpha);
             }
 
             for (int i = 0; i < 2; i++)
             {
                 trumpQuota[s, i].color =
-                    Alpha(
-                        TrumpColor,
-                        i < trumpsLeft
-                            ? 1f
-                            : UsedAlpha);
+                Alpha(
+                    TrumpColor,
+                    i < trumpsLeft
+                    ? 1f
+                    : UsedAlpha);
             }
         }
 
-        Button MenuButton(
-            RectTransform page,
-            Vector2 anchor,
-            Vector2 position,
-            Vector2 size,
-            string label,
-            int fontSize,
-            Color ink)
+        void SetVisualState(
+            Button button,
+            CanvasGroup group,
+            bool enabled)
         {
-            var rt = UiKit.Rect(
-                "Button",
-                page,
-                anchor,
-                Half,
-                position,
-                size);
+            if (button != null)
+                button.interactable = enabled;
 
-            var image =
-                UiKit.RoundedImage(rt, CardStyle.Cream);
+            if (group != null)
+            {
+                group.alpha =
+                enabled ? 1f : DisabledAlpha;
 
-            var button =
-                UiKit.MakeButton(image);
+                group.interactable = enabled;
+                group.blocksRaycasts = enabled;
+            }
+        }
 
-            UiKit.Fill(
-                "Label",
-                rt,
-                label,
-                fontSize,
-                ink,
-                TextAnchor.MiddleCenter);
+        Sprite LoadSprite(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return null;
 
-            return button;
+            if (spriteCache.TryGetValue(path, out var cached))
+                return cached;
+
+            var texture =
+            Resources.Load<Texture2D>(path);
+
+            if (texture == null)
+                return null;
+
+            var sprite =
+            Sprite.Create(
+                texture,
+                new Rect(
+                    0f,
+                    0f,
+                    texture.width,
+                    texture.height),
+                    new Vector2(0.5f, 0.5f),
+                          100f);
+
+            spriteCache[path] = sprite;
+            return sprite;
+        }
+
+        static string PenaltyIconPath(ContractType type)
+        {
+            switch (type)
+            {
+                case ContractType.NoTricks:
+                    return "StatusIcons/no_tricks";
+                case ContractType.NoHearts:
+                    return "StatusIcons/no_hearts";
+                case ContractType.NoQueens:
+                    return "StatusIcons/no_queens";
+                case ContractType.NoMen:
+                    return "StatusIcons/no_men";
+                case ContractType.KingOfHearts:
+                    return "StatusIcons/rifki";
+                case ContractType.NoLastTwo:
+                    return "StatusIcons/last_two";
+                default:
+                    return null;
+            }
+        }
+
+        static string TrumpIconPath(Suit suit)
+        {
+            switch (suit)
+            {
+                case Suit.Clubs:
+                    return "StatusIcons/trump_clubs";
+                case Suit.Diamonds:
+                    return "StatusIcons/trump_diamonds";
+                case Suit.Hearts:
+                    return "StatusIcons/trump_hearts";
+                default:
+                    return "StatusIcons/trump_spades";
+            }
+        }
+
+        static string PenaltyButtonLabel(ContractType type)
+        {
+            switch (type)
+            {
+                case ContractType.NoTricks:
+                    return "El\nalmaz";
+                case ContractType.NoHearts:
+                    return "Kupa\nalmaz";
+                case ContractType.NoMen:
+                    return "Erkek\nalmaz";
+                case ContractType.NoQueens:
+                    return "Kız\nalmaz";
+                case ContractType.KingOfHearts:
+                    return "Rıfkı\nalmaz";
+                case ContractType.NoLastTwo:
+                    return "Son iki\nalmaz";
+                default:
+                    return GameText.ContractLabel(type);
+            }
         }
 
         public void Show(
@@ -350,22 +572,40 @@ namespace King.UI
 
             RefreshQuota(session);
 
+            bool trumpOpen = false;
+
             for (int i = 0; i < 7; i++)
             {
                 bool open = false;
 
                 for (int a = 0;
                      a < available.Count && !open;
-                     a++)
-                {
-                    open = (int)available[a] == i;
-                }
+                a++)
+                     {
+                         open = (int)available[a] == i;
+                     }
 
-                contractButtons[i].interactable =
-                    open;
+                     if (i == (int)ContractType.Trump)
+                     {
+                         trumpOpen = open;
+                     }
+                     else
+                     {
+                         SetVisualState(
+                             contractButtons[i],
+                             contractGroups[i],
+                             open);
+                     }
             }
 
-            suitPage.SetActive(false);
+            for (int i = 0; i < 4; i++)
+            {
+                SetVisualState(
+                    suitButtons[i],
+                    suitGroups[i],
+                    trumpOpen);
+            }
+
             contractPage.SetActive(true);
             overlay.SetActive(true);
         }

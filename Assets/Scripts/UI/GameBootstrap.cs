@@ -138,7 +138,7 @@ namespace King.UI
                     // a coin toss.
                     handView.Show(hands[(int)Seat.South]);
                     handView.DisableAll();
-                    statusLine.Set($"El {session.DealNumber}/{Session.DealCount}   kontratı seçin");
+                    statusLine.Set($"El {session.DealNumber}/{Session.DealCount}");
                     ContractCall? picked = null;
                     picker.Show(session, available, c => picked = c);
                     while (!picked.HasValue)

@@ -12,6 +12,7 @@ namespace King.UI
 
         readonly CardFace[] faces = new CardFace[4];
         readonly Text[] labels = new Text[4];
+        readonly Text[] callerStars = new Text[4];
 
         public TrickView(Transform canvas)
         {
@@ -96,7 +97,36 @@ namespace King.UI
                 TextAnchor.MiddleCenter);
 
             for (int s = 0; s < 4; s++)
+            {
                 labels[s].fontStyle = FontStyle.Bold;
+
+                callerStars[s] = UiKit.Label(
+                    "CallerStar" + s,
+                    labels[s].transform,
+                    new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f),
+                    new Vector2(150f, 1f),
+                    new Vector2(54f, 54f),
+                    "★",
+                    50,
+                    new Color32(255, 201, 43, 255),
+                    TextAnchor.MiddleCenter);
+
+                callerStars[s].fontStyle = FontStyle.Bold;
+                callerStars[s].raycastTarget = false;
+
+                var shadow = callerStars[s].gameObject.AddComponent<Shadow>();
+                shadow.effectColor = new Color32(50, 27, 0, 210);
+                shadow.effectDistance = new Vector2(3f, -4f);
+                shadow.useGraphicAlpha = true;
+
+                var outline = callerStars[s].gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color32(164, 96, 0, 255);
+                outline.effectDistance = new Vector2(1.5f, -1.5f);
+                outline.useGraphicAlpha = true;
+
+                callerStars[s].gameObject.SetActive(false);
+            }
         }
 
         public void ShowCurrent(IReadOnlyList<(Seat Seat, Card Card)> plays)
@@ -128,12 +158,10 @@ namespace King.UI
 
         public void MarkCaller(Seat caller)
         {
-            string gold = ColorUtility.ToHtmlStringRGB(CardStyle.Gold);
-
             for (int s = 0; s < 4; s++)
             {
-                string name = GameText.SeatLabel((Seat)s);
-                labels[s].text = s == (int)caller ? name + "  <color=#" + gold + "><size=72>★</size></color>" : name;
+                labels[s].text = GameText.SeatLabel((Seat)s);
+                callerStars[s].gameObject.SetActive(s == (int)caller);
             }
         }
 
