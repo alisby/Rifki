@@ -292,7 +292,7 @@ namespace King.UI
 
                 totalScore[s].color =
                     score > 0
-                        ? CardStyle.Gold
+                        ? TrumpColor
                         : score < 0
                             ? PenaltyColor
                             : CardStyle.Cream;
