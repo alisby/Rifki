@@ -173,12 +173,96 @@ namespace King.UI
             return true;
         }
 
-        static Seat? FindBotTrumpBreaker(System.Collections.Generic.IReadOnlyList<Card>[] hands)
+        static Seat? FindBotTrumpBreaker(
+            System.Collections.Generic.IReadOnlyList<Card>[] hands,
+            Suit trump,
+            BotDifficulty difficulty)
         {
             for (int s = 1; s < 4; s++)
-                if (CanBreakTrumpHand(hands[s]))
+            {
+                if (!CanBreakTrumpHand(hands[s]))
+                    continue;
+
+                if (BotShouldBreakTrumpHand(
+                    hands[s],
+                    trump,
+                    difficulty))
                     return (Seat)s;
+            }
+
             return null;
+        }
+
+        static bool BotShouldBreakTrumpHand(
+            System.Collections.Generic.IReadOnlyList<Card> hand,
+            Suit trump,
+            BotDifficulty difficulty)
+        {
+            int trumpCount = 0;
+            int trumpQuality = 0;
+            int[] suitCounts = new int[4];
+
+            foreach (var card in hand)
+            {
+                suitCounts[(int)card.Suit]++;
+
+                if (card.Suit != trump)
+                    continue;
+
+                trumpCount++;
+
+                switch (card.Rank)
+                {
+                    case Rank.Ten:
+                        trumpQuality += 5;
+                        break;
+                    case Rank.Nine:
+                        trumpQuality += 4;
+                        break;
+                    case Rank.Eight:
+                        trumpQuality += 3;
+                        break;
+                    case Rank.Seven:
+                        trumpQuality += 2;
+                        break;
+                    case Rank.Six:
+                        trumpQuality += 1;
+                        break;
+                }
+            }
+
+            int distribution = 0;
+
+            if (trumpCount > 0)
+            {
+                for (int s = 0; s < 4; s++)
+                {
+                    if ((Suit)s == trump)
+                        continue;
+
+                    if (suitCounts[s] == 0)
+                        distribution += 3;
+                    else if (suitCounts[s] == 1)
+                        distribution += 1;
+                }
+            }
+
+            int strength =
+                trumpCount * 4
+                + trumpQuality
+                + distribution;
+
+            switch (difficulty)
+            {
+                case BotDifficulty.Easy:
+                    return strength < 22;
+
+                case BotDifficulty.Hard:
+                    return strength < 30;
+
+                default:
+                    return strength < 26;
+            }
         }
 
         static bool BotShouldDeclareRifki(System.Collections.Generic.IReadOnlyList<Card> hand, Suit trump)
@@ -243,7 +327,10 @@ namespace King.UI
                 }
                 if (call.Type == ContractType.Trump)
                 {
-                    Seat? botBreaker = FindBotTrumpBreaker(hands);
+                    Seat? botBreaker = FindBotTrumpBreaker(
+                        hands,
+                        call.TrumpSuit.Value,
+                        difficulty);
 
                     if (botBreaker.HasValue)
                     {
