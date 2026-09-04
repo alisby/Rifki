@@ -44,7 +44,7 @@ namespace King.UI
                 faces[s].SetVisible(false);
             }
 
-            BuildPlayerPanel(canvas, Seat.South, new Vector2(0.5f, 0.5f), new Vector2(0f, -187f));
+            BuildPlayerPanel(canvas, Seat.South, new Vector2(0.5f, 0.5f), new Vector2(0f, -222f));
             BuildPlayerPanel(canvas, Seat.West, new Vector2(0f, 0.5f), new Vector2(250f, 32f));
             BuildPlayerPanel(canvas, Seat.North, new Vector2(0.5f, 1f), new Vector2(0f, -107f));
             BuildPlayerPanel(canvas, Seat.East, new Vector2(1f, 0.5f), new Vector2(-250f, 32f));
@@ -55,7 +55,7 @@ namespace King.UI
                 center,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -210f),
+                new Vector2(0f, -245f),
                 new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.South),
                 36,

@@ -33,7 +33,7 @@ namespace King.UI
                 canvas,
                 Seat.South,
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-89f, -222f));
+                new Vector2(-89f, -257f));
 
             Build(
                 canvas,
