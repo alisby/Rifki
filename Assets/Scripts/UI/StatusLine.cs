@@ -11,7 +11,7 @@ namespace King.UI
         readonly Text contractText;
         readonly Text separatorText;
         readonly Text trumpGlyph;
-        readonly Text rifkiText;
+        readonly Text kingText;
         readonly Image contractIcon;
 
         string currentIconPath;
@@ -122,35 +122,35 @@ namespace King.UI
             trumpGlyph.fontStyle =
                 FontStyle.Bold;
 
-            rifkiText = UiKit.Label(
-                "RifkiDeclaration",
+            kingText = UiKit.Label(
+                "KingDeclaration",
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
                 new Vector2(82f, -181f),
                 new Vector2(150f, 42f),
-                "Rıfkı",
+                "King",
                 34,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
 
-            rifkiText.fontStyle = FontStyle.Bold;
+            kingText.fontStyle = FontStyle.Bold;
 
-            var rifkiShadow =
-                rifkiText.gameObject.AddComponent<Shadow>();
-            rifkiShadow.effectColor =
+            var kingShadow =
+                kingText.gameObject.AddComponent<Shadow>();
+            kingShadow.effectColor =
                 new Color(0.20f, 0.10f, 0f, 0.85f);
-            rifkiShadow.effectDistance =
+            kingShadow.effectDistance =
                 new Vector2(2f, -2f);
 
-            var rifkiGlow =
-                rifkiText.gameObject.AddComponent<Outline>();
-            rifkiGlow.effectColor =
+            var kingGlow =
+                kingText.gameObject.AddComponent<Outline>();
+            kingGlow.effectColor =
                 new Color(1f, 0.76f, 0.18f, 0.55f);
-            rifkiGlow.effectDistance =
+            kingGlow.effectDistance =
                 new Vector2(1.2f, -1.2f);
 
-            rifkiText.gameObject.SetActive(false);
+            kingText.gameObject.SetActive(false);
 
             contractText = UiKit.Label(
                 "Contract",
@@ -175,9 +175,9 @@ namespace King.UI
             trumpGlyph.gameObject.SetActive(false);
         }
 
-        public void SetRifkiDeclared(bool declared)
+        public void SetKingDeclared(bool declared)
         {
-            rifkiText.gameObject.SetActive(declared);
+            kingText.gameObject.SetActive(declared);
         }
 
         public void Set(string value)

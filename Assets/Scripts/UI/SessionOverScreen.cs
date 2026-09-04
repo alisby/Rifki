@@ -45,16 +45,16 @@ namespace King.UI
 
         public void Show(Session session)
         {
-            if (session.RifkiEnded)
+            if (session.KingEnded)
             {
-                ShowRifkiResult(session);
+                ShowKingResult(session);
                 return;
             }
 
             var totals = session.Totals;
 
-            // Best score first; ties break toward the earlier seat since Array.Sort
-            // alone makes no ordering promise for equal keys.
+            // Best score first. Equal top scores are joint winners;
+            // seat order is used only to keep the displayed list deterministic.
             var order = new[] { 0, 1, 2, 3 };
             Array.Sort(order, (a, b) =>
             {
@@ -62,28 +62,38 @@ namespace King.UI
                 return byTotal != 0 ? byTotal : a.CompareTo(b);
             });
 
-            winnerLine.text = GameText.SeatLabel((Seat)order[0]) + " kazandı";
+            int bestTotal = totals[order[0]];
+            var winners = new System.Collections.Generic.List<string>();
+            for (int i = 0; i < order.Length; i++)
+            {
+                int seat = order[i];
+                if (totals[seat] == bestTotal)
+                    winners.Add(GameText.SeatLabel((Seat)seat));
+            }
+
+            winnerLine.text = string.Join(" ve ", winners) + " kazandı";
+
             for (int i = 0; i < 4; i++)
             {
                 int seat = order[i];
                 standings[i].text = GameText.SeatLabel((Seat)seat) + "   " + totals[seat];
-                standings[i].color = i == 0 ? CardStyle.Gold : CardStyle.Cream;
+                standings[i].color = totals[seat] == bestTotal ? CardStyle.Gold : CardStyle.Cream;
             }
             overlay.SetActive(true);
         }
 
-        void ShowRifkiResult(Session session)
+        void ShowKingResult(Session session)
         {
-            Seat declarer = session.RifkiDeclarer.Value;
+            Seat declarer = session.KingDeclarer.Value;
 
-            winnerLine.text = session.RifkiSucceeded
-                ? GameText.SeatLabel(declarer) + " Rıfkı yaptı — tek başına çıktı"
-                : GameText.SeatLabel(declarer) + " Rıfkı yapamadı — tek başına battı";
+            winnerLine.text = session.KingSucceeded
+                ? GameText.SeatLabel(declarer) + " King yaptı — tek başına çıktı"
+                : GameText.SeatLabel(declarer) + " King yapamadı — tek başına battı";
 
             for (int s = 0; s < 4; s++)
             {
                 bool isDeclarer = s == (int)declarer;
-                bool outPlayer = session.RifkiSucceeded ? isDeclarer : !isDeclarer;
+                bool outPlayer = session.KingSucceeded ? isDeclarer : !isDeclarer;
 
                 standings[s].text =
                     GameText.SeatLabel((Seat)s)

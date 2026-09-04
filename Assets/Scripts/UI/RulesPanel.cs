@@ -82,7 +82,7 @@ namespace King.UI
                 new Vector2(0.5f, 1f),
                 new Vector2(0f, -34f),
                 new Vector2(760f, 54f),
-                "Mevcut Kurallar",
+                "Oyun Kuralları",
                 36,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
@@ -162,69 +162,69 @@ namespace King.UI
             viewportImage.raycastTarget = true;
 
             const string rules =
-@"<size=27><color=#E4BD58><b>TEMEL OYNANIŞ</b></color></size>
+@"<size=27><color=#E4BD58><b>OYUN DÜZENİ</b></color></size>
 
-• Oyun 4 kişiyle ve 52 kartla oynanır. Her oyuncuya 13 kart dağıtılır.
-• Bir oyun toplam 20 elden oluşur.
-• Her oyuncu toplam 5 kontrat söyler: 3 ceza oyunu ve 2 koz oyunu.
-• İlk dört elde koz kontratı söylenemez.
-• Kontrat söyleme sırası her elde bir sonraki oyuncuya geçer.
+• Oyun 4 kişiyle ve toplam 20 oyun üzerinden oynanır. Her oyuncuya 13 kart dağıtılır.
+• Her oyuncu 5 kez kontrat söyler: 3 ceza ve 2 koz.
+• Altı ceza türünün her biri parti boyunca iki kez oynanır; toplam 12 ceza ve 8 koz oyunu vardır.
+• İlk dört oyunda koz söylenemez.
+• İlk kontratı Karo 2'nin bulunduğu oyuncu söyler. Kontrat sırası her oyundan sonra kontratçının sağındaki oyuncuya geçer.
+• Bir oyuncu üç ceza kontratı hakkını kullandıktan sonra kalan iki çağrısında koz söylemek zorundadır.
+• King ilanıyla parti erken sona ermezse 20 oyunun sonunda toplam puanı en yüksek oyuncu kazanır. En yüksek puanı birden fazla oyuncu paylaşırsa bu oyuncular birlikte kazanır.
 
-<size=27><color=#E4BD58><b>KART OYNAMA KURALLARI</b></color></size>
+<size=27><color=#E4BD58><b>TEMEL OYNANIŞ</b></color></size>
 
-• Yere açılan renkten elde kart varsa aynı renkten oynamak zorunludur.
-• Kozsuz oyunlarda açılan renkten kart yoksa uygun olan herhangi bir kart oynanabilir.
-• Bir eli, koz kullanılmamışsa açılan rengin en yüksek kartı kazanır.
-• Koz oynanmışsa en yüksek koz eli kazanır.
+• Kontratı söyleyen oyuncu ilk kartı oynar. Her eli kazanan oyuncu sonraki ele başlar.
+• Koz olmayan oyunlarda eli açılan rengin en yüksek kartı kazanır. Koz oyununda koz oynanmışsa en yüksek koz; koz oynanmamışsa açılan rengin en yüksek kartı eli kazanır. Kart sırası 2, 3, …, 10, Vale, Kız, Papaz, As şeklindedir.
+• Açılan renkten elde kart varsa o renkten oynamak zorunludur.
+• Ceza oyunlarında açılan renkten kart yoksa, elde o oyuna ait ceza kartı varsa ceza kartı atılmak zorundadır.
+• Açılan renge uyarken eldeki ceza kartı masadaki daha yüksek kart nedeniyle artık eli alamayacak durumdaysa, o ceza kartı oynanmak zorundadır.
+• Puanlanacak bütün ceza kartları oynandığında oyun 13 el tamamlanmadan sona erebilir.
+
+<size=27><color=#E4BD58><b>CEZA OYUNLARI</b></color></size>
+
+<b>El Almaz</b>
+• Alınan her el −50 puandır.
+
+<b>Kupa Almaz</b>
+• Alınan her kupa −30 puandır.
+• Kupa açılmadan kupayla ele başlanamaz; elde açılan renkten yoksa ve kupa varsa kupa atılır.
+• Elde yalnızca kupa kaldığında kupayla başlanabilir.
+
+<b>Kız Almaz</b>
+• Alınan her Kız −100 puandır.
+• Açılan renkten yoksa elde Kız varsa Kız atılır.
+• Dört oyuncunun her biri birer Kız alırsa oyun iptal edilir; kontrat hakkı geri verilir ve aynı kontratçı yeniden oyun seçer.
+
+<b>Erkek Almaz</b>
+• Vale ve Papazlar erkektir. Alınan her erkek −60 puandır.
+• Açılan renkten yoksa elde erkek varsa erkek atılır.
+
+<b>Rıfkı</b>
+• Kupa Papazı Rıfkı'dır ve −320 puandır.
+• Kupa açılmadan kupayla ele başlanamaz.
+• Açılan renkten yoksa elde Rıfkı varsa önce Rıfkı atılmak zorundadır; Rıfkı yoksa elde kupa varsa kupa atılır.
+• Rıfkı alındığında oyun sona erer.
+• Kupa grubunda yalnızca K♥ veya yalnızca K♥ + A♥ bulunan oyuncu, oyun başlamadan Rıfkı elini bozabilir. El bozulursa aynı Rıfkı kontratı yeniden dağıtılır.
+
+<b>Son İki</b>
+• İlk 11 el puan getirmez. Son iki elin her biri −180 puandır.
 
 <size=27><color=#E4BD58><b>KOZ OYUNU</b></color></size>
 
-• Açılan renkten elde kart yoksa ve elde koz varsa koz atmak zorunludur.
-• El kozla açılmışsa ve masadaki en yüksek kozu geçebilecek koz varsa daha yüksek koz oynamak zorunludur.
-• Başka bir renge kozla çakarken masadaki kozu yükseltmek zorunlu değildir.
-• Açılan renkten de kozdan da yoksa herhangi bir kart oynanabilir.
-• Koz oyununda alınan eller pozitif puan getirir.
+• Alınan her el +50 puandır.
+• Açılan renkten kart yoksa elde koz varsa koz atmak zorunludur.
+• Ele kozla başlanmışsa ve masadaki en yüksek kozu geçebilecek koz varsa yükseltmek zorunludur.
+• Başka bir renge çakarken masadaki kozu yükseltmek zorunlu değildir.
+• Koz açılmadan normal olarak kozla ele başlanamaz. Elde yalnızca koz kaldığında kozla başlanabilir.
+• İstisna olarak, kontratçının başlangıç elinde koz A-K-Q birlikteyse ilk ele bu üç kozdan biriyle başlayabilir. Kontratçı ilk eli başka renkle açarsa bu özel hak sona erer.
+• Koz oyununda elinde hiçbir Vale, Kız, Papaz veya As bulunmayan oyuncu oyun başlamadan eli bozabilir. El bozulursa aynı koz kontratı yeniden dağıtılır.
 
-<size=27><color=#E4BD58><b>CEZA KONTRATLARI</b></color></size>
+<size=27><color=#E4BD58><b>KING İLANI</b></color></size>
 
-<b>El Almaz</b>
-Alınan her el ceza getirir.
-
-<b>Kupa Almaz</b>
-Alınan her kupa ceza getirir.
-Kupa henüz açılmamışsa kupa ile çıkılmaz.
-Açılan renkten elde kart yoksa ve elde kupa varsa kupa atmak zorunludur; böylece kupa açılmış olur.
-
-<b>Kız Almaz</b>
-Alınan her kız ceza getirir.
-Dört oyuncunun her biri tam bir kız alırsa el iptal edilir ve aynı el yeniden oynanır.
-
-<b>Erkek Almaz</b>
-Vale ve papazlar ceza kartıdır.
-
-<b>Rıfkı</b>
-Kupa papazını alan oyuncu cezayı alır.
-
-<b>Son İki</b>
-Oyunun son iki elini alan oyuncular ceza alır.
-
-<size=27><color=#E4BD58><b>KOZ ELİNİ BOZMA</b></color></size>
-
-• Koz kontratında bir oyuncunun elinde Vale, Kız, Papaz veya As hiç yoksa oyuncu eli bozabilir.
-• El bozulursa kartlar yeniden dağıtılır ve aynı koz kontratı yeniden oynanır.
-
-<size=27><color=#E4BD58><b>KOZDA RIFKI İLANI</b></color></size>
-
-• Koz söyleyen oyuncu el başlamadan önce Rıfkı ilan edebilir.
-• Rıfkı ilan eden oyuncu 10 el alırsa tek başına çıkar ve oyun sona erer.
-• Diğer üç oyuncu toplam 4 el aldığı anda Rıfkı ilan eden oyuncu başarısız olur, tek başına batar ve oyun sona erer.
-
-<size=27><color=#E4BD58><b>PUANLAMA VE OYUN SONU</b></color></size>
-
-• Ceza kontratlarında alınan ceza birimleri negatif puan getirir.
-• Koz kontratında alınan eller pozitif puan getirir.
-• Normal oyun 20 kontrat tamamlandığında sona erer.
-• Toplam puanı en yüksek olan oyuncu sıralamada önde yer alır.
+• Koz kontratını söyleyen oyuncu oyun başlamadan King ilan edebilir.
+• İlan eden oyuncu 10 el alırsa tek başına çıkar ve parti sona erer.
+• Rakipler toplam 4 el aldığında ilan eden artık 10 ele ulaşamayacağı için King başarısız olur; ilan eden tek başına batar ve parti sona erer.
 
 ";
 

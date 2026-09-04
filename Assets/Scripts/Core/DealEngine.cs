@@ -15,15 +15,16 @@ namespace King.Core
 
         Seat trickLeader;
 
-        // Koz kontratında, koz henüz oynanmadan önce kozla çıkış normalde
-        // yasaktır. Kontratı seçenin başlangıç elinde koz A-K-Q birlikteyse
-        // bu yasak baştan kalkar.
-        readonly bool trumpMayBeLedBeforeBroken;
+        // Koz kontratında koz açılmadan kozla çıkış normalde yasaktır.
+        // Tek istisna: kontratçının başlangıç elinde koz A-K-Q birlikteyse
+        // ilk ele bu üç onörden biriyle başlayabilir. Bu hak ilk elden sonra
+        // devam etmez ve diğer oyunculara aktarılmaz.
+        readonly bool callerMayOpenTrumpWithAkq;
 
         public ContractCall Contract { get; }
         public Seat Caller { get; }
-        public bool RifkiSucceeded { get; private set; }
-        public bool RifkiFailed { get; private set; }
+        public bool KingSucceeded { get; private set; }
+        public bool KingFailed { get; private set; }
         public Seat ToPlay { get; private set; }
         public bool IsComplete { get; private set; }
 
@@ -76,7 +77,7 @@ namespace King.Core
                 Suit trump = contract.TrumpSuit.Value;
                 var callerHand = this.hands[(int)leader];
 
-                trumpMayBeLedBeforeBroken =
+                callerMayOpenTrumpWithAkq =
                     callerHand.Any(c => c.Suit == trump && c.Rank == Rank.Ace)
                     && callerHand.Any(c => c.Suit == trump && c.Rank == Rank.King)
                     && callerHand.Any(c => c.Suit == trump && c.Rank == Rank.Queen);
@@ -116,19 +117,34 @@ namespace King.Core
                     return offSuit;
             }
 
-            // Koz henüz açılmamışsa kozla çıkılamaz.
-            // İstisna: kontratı seçen oyuncunun başlangıç elinde
-            // koz As-Papaz-Kız birlikte bulunuyorsa koz baştan açılabilir.
-            if (Contract.TrumpSuit != null
-                && !TrumpBroken
-                && !trumpMayBeLedBeforeBroken)
+            // Koz henüz açılmamışsa normal olarak kozla çıkılamaz.
+            if (Contract.TrumpSuit != null && !TrumpBroken)
             {
-                var nonTrumps =
-                    hand.Where(c => c.Suit != Contract.TrumpSuit.Value).ToList();
+                Suit trump = Contract.TrumpSuit.Value;
+                var nonTrumps = hand.Where(c => c.Suit != trump).ToList();
 
                 // Oyuncunun elinde yalnızca koz kaldıysa oyun kilitlenmemeli.
-                if (nonTrumps.Count > 0)
-                    return nonTrumps;
+                if (nonTrumps.Count == 0)
+                    return new List<Card>(hand);
+
+                // AKQ istisnası yalnızca kontratçının ilk açılışı içindir.
+                // İstisna varken bile düşük kozla değil, A/K/Q kozlarından
+                // biriyle oyuna başlanabilir.
+                if (callerMayOpenTrumpWithAkq
+                    && TrickNumber == 1
+                    && ToPlay == Caller)
+                {
+                    var candidates = new List<Card>(nonTrumps);
+                    candidates.AddRange(
+                        hand.Where(c =>
+                            c.Suit == trump
+                            && (c.Rank == Rank.Ace
+                                || c.Rank == Rank.King
+                                || c.Rank == Rank.Queen)));
+                    return candidates;
+                }
+
+                return nonTrumps;
             }
 
             return new List<Card>(hand);
@@ -267,19 +283,19 @@ namespace King.Core
             history.Add(trick);
             currentTrick.Clear();
 
-            if (Contract.RifkiDeclared
+            if (Contract.KingDeclared
                 && winner == Caller
                 && history.Count(t => t.Winner == Caller) >= 10)
             {
-                RifkiSucceeded = true;
+                KingSucceeded = true;
                 IsComplete = true;
                 return trick;
             }
 
-            if (Contract.RifkiDeclared
+            if (Contract.KingDeclared
                 && history.Count(t => t.Winner != Caller) >= 4)
             {
-                RifkiFailed = true;
+                KingFailed = true;
                 IsComplete = true;
                 return trick;
             }

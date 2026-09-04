@@ -5,7 +5,8 @@
         "King.Core",
         "King.AI",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "King.UI"
     ],
     "includePlatforms": [
         "Editor"

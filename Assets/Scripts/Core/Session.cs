@@ -62,11 +62,11 @@ namespace King.Core
                 default: return Seat.South;
             }
         }
-        public bool RifkiEnded { get; private set; }
-        public Seat? RifkiDeclarer { get; private set; }
-        public bool RifkiSucceeded { get; private set; }
+        public bool KingEnded { get; private set; }
+        public Seat? KingDeclarer { get; private set; }
+        public bool KingSucceeded { get; private set; }
 
-        public bool IsComplete => RifkiEnded || DealNumber > DealCount;
+        public bool IsComplete => KingEnded || DealNumber > DealCount;
         public IReadOnlyList<int> Totals => totalsView;
         public IReadOnlyList<ScoreRow> Sheet => sheetView;
 
@@ -247,11 +247,11 @@ namespace King.Core
             }
             sheet.Add(new ScoreRow(DealNumber, Caller, pending.Contract, points));
 
-            if (pending.Contract.RifkiDeclared)
+            if (pending.Contract.KingDeclared)
             {
-                RifkiEnded = true;
-                RifkiDeclarer = Caller;
-                RifkiSucceeded = pending.RifkiSucceeded;
+                KingEnded = true;
+                KingDeclarer = Caller;
+                KingSucceeded = pending.KingSucceeded;
             }
 
             pending = null;
