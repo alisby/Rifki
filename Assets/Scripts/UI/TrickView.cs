@@ -45,8 +45,8 @@ namespace King.UI
             }
 
             BuildPlayerPanel(canvas, Seat.South, new Vector2(0.5f, 0.5f), new Vector2(0f, -187f));
-            BuildPlayerPanel(canvas, Seat.West, new Vector2(0f, 0.5f), new Vector2(240f, 32f));
-            BuildPlayerPanel(canvas, Seat.North, new Vector2(0.5f, 1f), new Vector2(0f, -87f));
+            BuildPlayerPanel(canvas, Seat.West, new Vector2(0f, 0.5f), new Vector2(250f, 32f));
+            BuildPlayerPanel(canvas, Seat.North, new Vector2(0.5f, 1f), new Vector2(0f, -107f));
             BuildPlayerPanel(canvas, Seat.East, new Vector2(1f, 0.5f), new Vector2(-250f, 32f));
 
             // Ali remains above the human hand.
@@ -68,7 +68,7 @@ namespace King.UI
                 canvas,
                 new Vector2(0f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(240f, 76f),
+                new Vector2(250f, 76f),
                 new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.West),
                 36,
@@ -81,7 +81,7 @@ namespace King.UI
                 canvas,
                 new Vector2(0.5f, 1f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -42f),
+                new Vector2(0f, -62f),
                 new Vector2(190f, 42f),
                 GameText.SeatLabel(Seat.North),
                 36,

@@ -39,13 +39,13 @@ namespace King.UI
                 canvas,
                 Seat.West,
                 new Vector2(0f, 0.5f),
-                new Vector2(151f, -4f));
+                new Vector2(161f, -4f));
 
             Build(
                 canvas,
                 Seat.North,
                 new Vector2(0.5f, 1f),
-                new Vector2(-89f, -122f));
+                new Vector2(-89f, -142f));
 
             Build(
                 canvas,
