@@ -50,7 +50,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(82f, 16f),
+                new Vector2(266f, 16f),
                 new Vector2(138f, 56f),
                 "",
                 64,
@@ -96,7 +96,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(82f, -119f),
+                new Vector2(266f, -119f),
                 new Vector2(92f, 92f));
 
             contractIcon =
@@ -112,7 +112,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(82f, -119f),
+                new Vector2(266f, -119f),
                 new Vector2(106f, 106f),
                 "",
                 82,
@@ -127,10 +127,12 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(82f, -181f),
-                new Vector2(150f, 42f),
+                // Contract icon center is x=128. Keep the King label on the
+                // same horizontal center and place it below the contract name.
+                new Vector2(370f, -90f),
+                new Vector2(100f, 34f),
                 "King",
-                34,
+                27,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
 
@@ -157,19 +159,21 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(18f, 13f),
-                new Vector2(550f, 48f),
+                // Show the current contract directly below its icon.
+                // x=28 with width=200 shares the icon's x=128 center.
+                new Vector2(212f, -181f),
+                new Vector2(200f, 36f),
                 "",
-                34,
-                CardStyle.Gold,
-                TextAnchor.MiddleLeft);
+                27,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
 
             contractText.fontStyle =
                 FontStyle.Bold;
 
             contractText.resizeTextForBestFit = true;
-            contractText.resizeTextMinSize = 23;
-            contractText.resizeTextMaxSize = 34;
+            contractText.resizeTextMinSize = 20;
+            contractText.resizeTextMaxSize = 27;
 
             contractIcon.gameObject.SetActive(false);
             trumpGlyph.gameObject.SetActive(false);
@@ -309,10 +313,10 @@ namespace King.UI
         {
             trumpGlyph.gameObject.SetActive(false);
 
-            contractText.text = "";
+            contractText.text = contract;
 
             contractText.color =
-                PenaltyColor;
+                CardStyle.Cream;
 
             if (string.IsNullOrEmpty(path))
             {
@@ -365,8 +369,8 @@ namespace King.UI
             else if (contract.Contains("♠"))
                 path = "StatusIcons/trump_spades";
 
-            contractText.text = "";
-            contractText.color = TrumpColor;
+            contractText.text = contract;
+            contractText.color = CardStyle.Cream;
 
             if (string.IsNullOrEmpty(path))
             {

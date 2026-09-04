@@ -25,7 +25,7 @@ namespace King.UI
             overlayRect.offsetMax = Vector2.zero;
 
             var shade = overlay.GetComponent<Image>();
-            shade.color = new Color(0f, 0f, 0f, 0.52f);
+            shade.color = new Color(0f, 0f, 0f, 0.65f);
             shade.raycastTarget = true;
 
             var panel = UiKit.Rect(
@@ -36,7 +36,7 @@ namespace King.UI
                 Vector2.zero,
                 new Vector2(650f, 290f));
 
-            UiKit.RoundedImage(panel, new Color(0.025f, 0.11f, 0.065f, 0.98f));
+            UiKit.RoundedImage(panel, new Color(0.018f, 0.09f, 0.05f, 1f));
 
             titleText = UiKit.Label(
                 "Title", panel,

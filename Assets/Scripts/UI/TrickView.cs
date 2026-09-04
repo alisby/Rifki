@@ -44,6 +44,11 @@ namespace King.UI
                 faces[s].SetVisible(false);
             }
 
+            BuildPlayerPanel(canvas, Seat.South, new Vector2(0.5f, 0.5f), new Vector2(0f, -187f));
+            BuildPlayerPanel(canvas, Seat.West, new Vector2(0f, 0.5f), new Vector2(240f, 32f));
+            BuildPlayerPanel(canvas, Seat.North, new Vector2(0.5f, 1f), new Vector2(0f, -87f));
+            BuildPlayerPanel(canvas, Seat.East, new Vector2(1f, 0.5f), new Vector2(-250f, 32f));
+
             // Ali remains above the human hand.
             labels[(int)Seat.South] = UiKit.Label(
                 "SouthLabel",
@@ -142,6 +147,8 @@ namespace King.UI
                 callerStars[s].gameObject.SetActive(false);
             }
         }
+
+        static void BuildPlayerPanel(Transform canvas, Seat seat, Vector2 anchor, Vector2 position) { var panel = UiKit.Rect(seat + "InfoPanel", canvas, anchor, new Vector2(0.5f, 0.5f), position, new Vector2(424f, 148f)); var image = UiKit.RoundedImage(panel, new Color(0.012f, 0.060f, 0.035f, 0.42f)); image.raycastTarget = false; }
 
         public void ShowCurrent(IReadOnlyList<(Seat Seat, Card Card)> plays)
         {
