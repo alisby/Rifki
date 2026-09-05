@@ -40,7 +40,7 @@ namespace King.UI
         PlayerNameScreen playerNameScreen;
         DifficultyDialog difficultyDialog;
         BotDifficulty difficulty = BotDifficulty.Normal;
-
+        Text fullscreenLabel;
         static bool restartPending;
         static BotDifficulty restartDifficulty = BotDifficulty.Normal;
         static string restartSouth;
@@ -80,6 +80,13 @@ namespace King.UI
             RifkiBranding.ShowSplash(this, canvas);
         }
 
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F11))
+                ToggleFullscreen();
+        }
+
+
         void BeginGame(string south, string west, string north, string east)
         {
             GameText.SetSeatNames(south, west, north, east);
@@ -107,6 +114,7 @@ namespace King.UI
             gameProgress = new GameProgressPanel(canvas);
             playerQuota = new PlayerQuotaView(canvas);
             BuildNewGameButton();
+            BuildFullscreenButton();
             new RulesPanel(canvas);
 
             // Creation order is draw order: the sheet sits over the table,
@@ -613,12 +621,12 @@ namespace King.UI
                 canvas,
                 Vector2.one,
                 Vector2.one,
-                new Vector2(-24f, -14f),
+                new Vector2(-24f, -72f),
                 new Vector2(150f, 48f));
 
             var image = UiKit.RoundedImage(
                 rect,
-                new Color(0.05f, 0.14f, 0.08f, 0.92f));
+                new Color(0.28f, 0.07f, 0.08f, 0.95f));
 
             var button = UiKit.MakeButton(image);
 
@@ -631,6 +639,64 @@ namespace King.UI
                 TextAnchor.MiddleCenter);
 
             button.onClick.AddListener(ShowNewGameDialog);
+        }
+
+        void BuildFullscreenButton()
+        {
+            var rect = UiKit.Rect(
+                "FullscreenButton",
+                canvas,
+                Vector2.one,
+                Vector2.one,
+                new Vector2(-24f, -14f),
+                                  new Vector2(150f, 48f));
+
+            var image = UiKit.RoundedImage(
+                rect,
+                new Color(0.06f, 0.15f, 0.25f, 0.95f));
+
+            var button = UiKit.MakeButton(image);
+
+            fullscreenLabel = UiKit.Fill(
+                "Label",
+                rect,
+                Screen.fullScreenMode == FullScreenMode.Windowed
+                ? "Tam Ekran"
+                : "Pencere",
+                22,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
+
+            button.onClick.AddListener(ToggleFullscreen);
+        }
+
+        void ToggleFullscreen()
+        {
+            bool goFullscreen =
+            Screen.fullScreenMode == FullScreenMode.Windowed;
+
+            if (goFullscreen)
+            {
+                Resolution desktop = Screen.currentResolution;
+
+                Screen.SetResolution(
+                    desktop.width,
+                    desktop.height,
+                    FullScreenMode.FullScreenWindow);
+
+                if (fullscreenLabel != null)
+                    fullscreenLabel.text = "Pencere";
+            }
+            else
+            {
+                Screen.SetResolution(
+                    1200,
+                    675,
+                    FullScreenMode.Windowed);
+
+                if (fullscreenLabel != null)
+                    fullscreenLabel.text = "Tam Ekran";
+            }
         }
 
         void ShowNewGameDialog()

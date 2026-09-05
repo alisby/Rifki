@@ -36,7 +36,7 @@ namespace King.UI
         const float ColumnGap = 8f;
         const float StartX = 12f;
         const float StartY = -58f;
-        const float RowStep = 50f;
+        const float RowStep = 74f;
         const int RowsPerColumn = 3;
 
         public GameProgressPanel(Transform canvas)
@@ -47,7 +47,7 @@ namespace King.UI
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
                 new Vector2(-190f, -18f),
-                new Vector2(330f, 220f));
+                new Vector2(330f, 276f));
 
             UiKit.RoundedImage(panel, PanelColor);
 
