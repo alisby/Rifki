@@ -111,6 +111,10 @@ namespace King.UI
             opponentsView = new OpponentsView(canvas);
             handView = new HandView(canvas, OnCardClicked);
             statusLine = new StatusLine(canvas);
+            statusLine.SetDifficulty(
+                difficulty == BotDifficulty.Easy ? "Kolay" :
+                difficulty == BotDifficulty.Hard ? "Zor" :
+                "Normal");
             gameProgress = new GameProgressPanel(canvas);
             playerQuota = new PlayerQuotaView(canvas);
             BuildNewGameButton();

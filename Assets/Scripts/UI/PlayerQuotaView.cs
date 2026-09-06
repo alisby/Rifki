@@ -9,8 +9,8 @@ namespace King.UI
     // Current-deal captured units are shown below their symbol group.
     public sealed class PlayerQuotaView
     {
-        readonly Text[,] penalty = new Text[4, 3];
-        readonly Text[,] trump = new Text[4, 2];
+        readonly Image[,] penalty = new Image[4, 3];
+        readonly Image[,] trump = new Image[4, 2];
 
         readonly Text[] dealTaken = new Text[4];
         readonly Text[] totalScore = new Text[4];
@@ -20,9 +20,6 @@ namespace King.UI
 
         static readonly Color TrumpColor =
             new Color(0.43f, 0.66f, 0.98f, 1f);
-
-        static readonly Color QuotaBoxColor =
-            new Color(0.020f, 0.085f, 0.050f, 0.62f);
 
         const float UsedAlpha = 0.20f;
 
@@ -54,10 +51,17 @@ namespace King.UI
                 new Vector2(-339f, -4f));
         }
 
-        static Color Alpha(Color color, float alpha)
+        static Sprite LoadRuntimeSprite(string path)
         {
-            color.a = alpha;
-            return color;
+            var texture = Resources.Load<Texture2D>(path);
+            if (texture == null)
+                return null;
+
+            return Sprite.Create(
+                texture,
+                new Rect(0f, 0f, texture.width, texture.height),
+                new Vector2(0.5f, 0.5f),
+                100f);
         }
 
         void Build(
@@ -74,114 +78,57 @@ namespace King.UI
                 position,
                 new Vector2(240f, 60f));
 
-            // Altlık kaldırıldı; 3D işaretler kullanılacak.
-
             float[] x =
             {
-                -46f, -20f, 6f,
-                44f, 70f
+                -48f, -18f, 12f,
+                50f, 80f
             };
+
+            var penaltySprite =
+                LoadRuntimeSprite("QuotaIcons/penalty_token");
+            var trumpSprite =
+                LoadRuntimeSprite("QuotaIcons/trump_token");
 
             for (int i = 0; i < 3; i++)
             {
-                penalty[(int)seat, i] = UiKit.Label(
+                var rt = UiKit.Rect(
                     "Penalty" + i,
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
                     new Vector2(x[i], 0f),
-                    new Vector2(28f, 30f),
-                    "●",
-                    28,
-                    PenaltyColor,
-                    TextAnchor.MiddleCenter);
+                    new Vector2(36f, 36f));
 
-                penalty[(int)seat, i].fontStyle =
-                    FontStyle.Bold;
+                penalty[(int)seat, i] =
+                    rt.gameObject.AddComponent<Image>();
 
-                var penaltyShadow =
-                    penalty[(int)seat, i].gameObject.AddComponent<Shadow>();
-
-                penaltyShadow.effectColor =
-                    new Color(0.16f, 0.04f, 0.04f, 0.62f);
-
-                penaltyShadow.effectDistance =
-                    new Vector2(1.3f, -1.3f);
-
-                penaltyShadow.useGraphicAlpha = true;
-
-                var penaltyOutline =
-                    penalty[(int)seat, i].gameObject.AddComponent<Outline>();
-
-                penaltyOutline.effectColor =
-                    new Color(0.38f, 0.10f, 0.10f, 0.96f);
-
-                penaltyOutline.effectDistance =
-                    new Vector2(0.9f, -0.9f);
-
-                penaltyOutline.useGraphicAlpha = true;
-
-                var penaltyHighlight =
-                    penalty[(int)seat, i].gameObject.AddComponent<Shadow>();
-
-                penaltyHighlight.effectColor =
-                    new Color(1f, 0.82f, 0.78f, 0.52f);
-
-                penaltyHighlight.effectDistance =
-                    new Vector2(-0.8f, 0.8f);
-
-                penaltyHighlight.useGraphicAlpha = true;
+                penalty[(int)seat, i].sprite =
+                    penaltySprite;
+                penalty[(int)seat, i].color =
+                    Color.white;
+                penalty[(int)seat, i].preserveAspect = true;
+                penalty[(int)seat, i].raycastTarget = false;
             }
 
             for (int i = 0; i < 2; i++)
             {
-                trump[(int)seat, i] = UiKit.Label(
+                var rt = UiKit.Rect(
                     "Trump" + i,
                     row,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
                     new Vector2(x[3 + i], 1f),
-                    new Vector2(28f, 30f),
-                    "▲",
-                    26,
-                    TrumpColor,
-                    TextAnchor.MiddleCenter);
+                    new Vector2(36f, 36f));
 
-                trump[(int)seat, i].fontStyle =
-                    FontStyle.Bold;
+                trump[(int)seat, i] =
+                    rt.gameObject.AddComponent<Image>();
 
-                var trumpShadow =
-                    trump[(int)seat, i].gameObject.AddComponent<Shadow>();
-
-                trumpShadow.effectColor =
-                    new Color(0.03f, 0.08f, 0.18f, 0.62f);
-
-                trumpShadow.effectDistance =
-                    new Vector2(1.3f, -1.3f);
-
-                trumpShadow.useGraphicAlpha = true;
-
-                var trumpOutline =
-                    trump[(int)seat, i].gameObject.AddComponent<Outline>();
-
-                trumpOutline.effectColor =
-                    new Color(0.08f, 0.19f, 0.42f, 0.96f);
-
-                trumpOutline.effectDistance =
-                    new Vector2(0.9f, -0.9f);
-
-                trumpOutline.useGraphicAlpha = true;
-
-                var trumpHighlight =
-                    trump[(int)seat, i].gameObject.AddComponent<Shadow>();
-
-                trumpHighlight.effectColor =
-                    new Color(0.82f, 0.91f, 1f, 0.52f);
-
-                trumpHighlight.effectDistance =
-                    new Vector2(-0.8f, 0.8f);
-
-                trumpHighlight.useGraphicAlpha = true;
+                trump[(int)seat, i].sprite =
+                    trumpSprite;
+                trump[(int)seat, i].color =
+                    Color.white;
+                trump[(int)seat, i].preserveAspect = true;
+                trump[(int)seat, i].raycastTarget = false;
             }
 
             dealTaken[(int)seat] = UiKit.Label(
@@ -225,7 +172,7 @@ namespace King.UI
                 dealTaken[(int)seat].gameObject.AddComponent<Shadow>();
 
             countHighlight.effectColor =
-                new Color(1f, 1f, 1f, 0.38f);
+                new Color(1f, 1f, 1f, 0.10f);
 
             countHighlight.effectDistance =
                 new Vector2(-0.9f, 0.9f);
@@ -294,22 +241,26 @@ namespace King.UI
                     score > 0
                         ? TrumpColor
                         : score < 0
-                            ? PenaltyColor
+                            ? new Color(0.95f, 0.12f, 0.08f, 1f)
                             : CardStyle.Cream;
 
                 for (int i = 0; i < 3; i++)
                 {
                     penalty[s, i].color =
-                        Alpha(
-                            PenaltyColor,
+                        new Color(
+                            1f,
+                            1f,
+                            1f,
                             i < penaltiesLeft ? 1f : UsedAlpha);
                 }
 
                 for (int i = 0; i < 2; i++)
                 {
                     trump[s, i].color =
-                        Alpha(
-                            TrumpColor,
+                        new Color(
+                            1f,
+                            1f,
+                            1f,
                             i < trumpsLeft ? 1f : UsedAlpha);
                 }
             }
@@ -332,16 +283,14 @@ namespace King.UI
                 dealTaken[s].color =
                     deal.Contract.Type == ContractType.Trump
                         ? TrumpColor
-                        : PenaltyColor;
+                        : new Color(0.95f, 0.12f, 0.08f, 1f);
             }
         }
 
         public void ClearDealCounts()
         {
             for (int s = 0; s < 4; s++)
-            {
                 dealTaken[s].text = "";
-            }
         }
     }
 }

@@ -7,6 +7,7 @@ namespace King.UI
     public sealed class StatusLine
     {
         readonly Text dealText;
+        readonly Text difficultyText;
         readonly Text callerText;
         readonly Text contractText;
         readonly Text separatorText;
@@ -60,6 +61,22 @@ namespace King.UI
             dealText.fontStyle =
                 FontStyle.Bold;
 
+
+            difficultyText = UiKit.Label(
+                "DifficultyText",
+                box,
+                new Vector2(0f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(70f, 16f),
+                new Vector2(120f, 48f),
+                "",
+                30,
+                CardStyle.Gold,
+                TextAnchor.MiddleCenter);
+
+            difficultyText.fontStyle =
+                FontStyle.Bold;
+
             callerText = UiKit.Label(
                 "Caller",
                 box,
@@ -96,8 +113,8 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(266f, -119f),
-                new Vector2(124f, 124f));
+                new Vector2(230f, -160f),
+                new Vector2(164f, 164f));
 
             contractIcon =
                 iconRect.gameObject
@@ -161,7 +178,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Show the current contract directly below its icon.
                 // x=28 with width=200 shares the icon's x=128 center.
-                new Vector2(212f, -201f),
+                new Vector2(212f, -216f),
                 new Vector2(200f, 36f),
                 "",
                 27,
@@ -406,5 +423,11 @@ namespace King.UI
             contractIcon.gameObject.SetActive(
                 contractIcon.sprite != null);
         }
+
+        public void SetDifficulty(string value)
+        {
+            difficultyText.text = value ?? "";
+        }
+
     }
 }
