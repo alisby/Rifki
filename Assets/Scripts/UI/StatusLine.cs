@@ -97,7 +97,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
                 new Vector2(266f, -119f),
-                new Vector2(92f, 92f));
+                new Vector2(124f, 124f));
 
             contractIcon =
                 iconRect.gameObject
@@ -161,7 +161,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Show the current contract directly below its icon.
                 // x=28 with width=200 shares the icon's x=128 center.
-                new Vector2(212f, -181f),
+                new Vector2(212f, -201f),
                 new Vector2(200f, 36f),
                 "",
                 27,
