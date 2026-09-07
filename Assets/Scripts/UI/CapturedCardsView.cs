@@ -184,8 +184,6 @@ namespace King.UI
 
             for (int s = 0; s < 4; s++)
             {
-                captured[s].Sort(CompareCards);
-
                 int count =
                     Mathf.Min(
                         captured[s].Count,
@@ -272,6 +270,10 @@ namespace King.UI
             Vector2 position;
             int fontSize;
 
+            bool rightToLeft =
+                seat == Seat.North
+                || seat == Seat.East;
+
             if (mode == DisplayMode.Hearts)
             {
                 if (seat == Seat.North)
@@ -279,10 +281,12 @@ namespace King.UI
                     size = HeartNorthCardSize;
                     fontSize = 19;
 
+                    // North:
+                    // right -> left, top -> bottom.
                     if (index < 7)
                     {
                         position = RowPosition(
-                            index,
+                            6 - index,
                             7,
                             HeartNorthCardSize.x,
                             3f,
@@ -291,7 +295,7 @@ namespace King.UI
                     else
                     {
                         position = RowPosition(
-                            index - 7,
+                            5 - (index - 7),
                             6,
                             HeartNorthCardSize.x,
                             3f,
@@ -303,8 +307,13 @@ namespace King.UI
                     size = HeartWideCardSize;
                     fontSize = 16;
 
+                    int column =
+                        seat == Seat.East
+                            ? 12 - index
+                            : index;
+
                     position = RowPosition(
-                        index,
+                        column,
                         13,
                         HeartWideCardSize.x,
                         2f,
@@ -319,8 +328,14 @@ namespace King.UI
             {
                 size = PenaltyCardSize;
                 fontSize = 30;
+
+                int column =
+                    rightToLeft
+                        ? 3 - index
+                        : index;
+
                 position = RowPosition(
-                    index,
+                    column,
                     4,
                     PenaltyCardSize.x,
                     7f,
@@ -334,24 +349,42 @@ namespace King.UI
                 size = PenaltyCardSize;
                 fontSize = 23;
 
-                if (index < 4)
+                int sequenceRow =
+                    index / 4;
+
+                int column =
+                    index % 4;
+
+                if (rightToLeft)
+                    column = 3 - column;
+
+                float y;
+
+                if (seat == Seat.East)
                 {
-                    position = RowPosition(
-                        index,
-                        4,
-                        PenaltyCardSize.x,
-                        7f,
-                        32f);
+                    // East:
+                    // right -> left, bottom -> top.
+                    y =
+                        sequenceRow == 0
+                            ? -32f
+                            : 32f;
                 }
                 else
                 {
-                    position = RowPosition(
-                        index - 4,
-                        4,
-                        PenaltyCardSize.x,
-                        7f,
-                        -32f);
+                    // North, West, South:
+                    // top -> bottom.
+                    y =
+                        sequenceRow == 0
+                            ? 32f
+                            : -32f;
                 }
+
+                position = RowPosition(
+                    column,
+                    4,
+                    PenaltyCardSize.x,
+                    7f,
+                    y);
 
                 item.Label.text =
                     CardStyle.RankGlyph(card.Rank)
@@ -359,6 +392,7 @@ namespace King.UI
             }
 
             item.Root.sizeDelta = size;
+
             item.Inner.sizeDelta =
                 new Vector2(
                     size.x - 4f,
@@ -368,6 +402,7 @@ namespace King.UI
                 position + SeatOffset(mode, seat);
 
             item.Label.fontSize = fontSize;
+
             item.Label.color =
                 CardStyle.Ink(card.Suit);
 
@@ -472,22 +507,6 @@ namespace King.UI
                 default:
                     return Vector2.zero;
             }
-        }
-
-
-        static int CompareCards(
-            Card a,
-            Card b)
-        {
-            int rank =
-                ((int)b.Rank)
-                    .CompareTo((int)a.Rank);
-
-            if (rank != 0)
-                return rank;
-
-            return ((int)a.Suit)
-                .CompareTo((int)b.Suit);
         }
 
         public void Clear()
