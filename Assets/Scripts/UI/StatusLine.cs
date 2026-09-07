@@ -51,7 +51,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(266f, 16f),
+                new Vector2(102f, 16f),
                 new Vector2(138f, 56f),
                 "",
                 64,
@@ -67,7 +67,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(70f, 16f),
+                new Vector2(88f, -262f),
                 new Vector2(120f, 48f),
                 "",
                 30,
@@ -113,7 +113,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(230f, -160f),
+                new Vector2(66f, -160f),
                 new Vector2(164f, 164f));
 
             contractIcon =
@@ -178,7 +178,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Show the current contract directly below its icon.
                 // x=28 with width=200 shares the icon's x=128 center.
-                new Vector2(212f, -216f),
+                new Vector2(48f, -216f),
                 new Vector2(200f, 36f),
                 "",
                 27,

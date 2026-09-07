@@ -29,12 +29,14 @@ namespace King.UI
         StatusLine statusLine;
         GameProgressPanel gameProgress;
         PlayerQuotaView playerQuota;
+        CapturedCardsView capturedCards;
         ScoresheetPanel scoresheet;
         RemainingCardsPanel remainingCards;
         NoticeBanner banner;
         ContractPicker picker;
         ChoiceDialog choiceDialog;
         SessionOverScreen sessionOver;
+
 
         Transform canvas;
         PlayerNameScreen playerNameScreen;
@@ -84,6 +86,7 @@ namespace King.UI
         {
             if (Input.GetKeyDown(KeyCode.F11))
                 ToggleFullscreen();
+
         }
 
 
@@ -117,6 +120,7 @@ namespace King.UI
                 "Normal");
             gameProgress = new GameProgressPanel(canvas);
             playerQuota = new PlayerQuotaView(canvas);
+            capturedCards = new CapturedCardsView(canvas);
             BuildNewGameButton();
             BuildFullscreenButton();
             new RulesPanel(canvas);
@@ -138,6 +142,7 @@ namespace King.UI
             gameProgress.Refresh(session);
             playerQuota.Refresh(session);
             scoresheet.Refresh(session);
+
             StartCoroutine(RunSession());
         }
 
@@ -530,6 +535,7 @@ namespace King.UI
                 if (deal.QueensSplitOneEach)
                 {
                     playerQuota.ClearDealCounts();
+                    capturedCards.Clear();
                     session.CancelDeal();
                     playerQuota.Refresh(session);
 
@@ -544,6 +550,7 @@ namespace King.UI
                 }
 
                 playerQuota.ClearDealCounts();
+                capturedCards.Clear();
                 session.FinishDeal();
                 playerQuota.Refresh(session);
                 gameProgress.Refresh(session);
@@ -558,6 +565,7 @@ namespace King.UI
             bool heartsMatter = deal.Contract.Type == ContractType.NoHearts
                 || deal.Contract.Type == ContractType.KingOfHearts;
             trickView.Clear();
+            capturedCards.Refresh(deal);
             RefreshTable();
             while (!deal.IsComplete)
             {
@@ -593,6 +601,7 @@ namespace King.UI
                     yield return new WaitForSeconds(
                         TrickLinger);
                     trickView.Clear();
+                    capturedCards.Refresh(deal);
                     // Clear() resets all four seat labels, so re-mark whoever leads next.
                     trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
                 }
