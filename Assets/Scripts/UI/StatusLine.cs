@@ -67,7 +67,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(88f, -262f),
+                new Vector2(88f, -274f),
                 new Vector2(120f, 48f),
                 "",
                 30,
@@ -146,28 +146,27 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Contract icon center is x=128. Keep the King label on the
                 // same horizontal center and place it below the contract name.
-                new Vector2(370f, -90f),
-                new Vector2(100f, 34f),
+                new Vector2(298f, -114f),
+                new Vector2(200f, 68f),
                 "King",
-                27,
+                54,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
 
             kingText.fontStyle = FontStyle.Bold;
+            kingText.color = new Color(1f, 0.88f, 0.08f, 1f);
 
-            var kingShadow =
-                kingText.gameObject.AddComponent<Shadow>();
+            var kingShadow = kingText.gameObject.AddComponent<Shadow>();
             kingShadow.effectColor =
-                new Color(0.20f, 0.10f, 0f, 0.85f);
+                new Color(0.55f, 0.04f, 0f, 0.95f);
             kingShadow.effectDistance =
-                new Vector2(2f, -2f);
+                new Vector2(6f, -6f);
 
-            var kingGlow =
-                kingText.gameObject.AddComponent<Outline>();
-            kingGlow.effectColor =
-                new Color(1f, 0.76f, 0.18f, 0.55f);
-            kingGlow.effectDistance =
-                new Vector2(1.2f, -1.2f);
+            var kingOutline = kingText.gameObject.AddComponent<Outline>();
+            kingOutline.effectColor =
+                new Color(1f, 0.30f, 0f, 0.95f);
+            kingOutline.effectDistance =
+                new Vector2(4f, -4f);
 
             kingText.gameObject.SetActive(false);
 
@@ -181,7 +180,7 @@ namespace King.UI
                 new Vector2(48f, -216f),
                 new Vector2(200f, 36f),
                 "",
-                27,
+                54,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
