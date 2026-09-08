@@ -178,6 +178,7 @@ namespace King.UI
 • Koz olmayan oyunlarda eli açılan rengin en yüksek kartı kazanır. Koz oyununda koz oynanmışsa en yüksek koz; koz oynanmamışsa açılan rengin en yüksek kartı eli kazanır. Kart sırası 2, 3, …, 10, Vale, Kız, Papaz, As şeklindedir.
 • Açılan renkten elde kart varsa o renkten oynamak zorunludur.
 • Ceza oyunlarında açılan renkten kart yoksa, elde o oyuna ait ceza kartı varsa ceza kartı atılmak zorundadır.
+• Açılan renkten kart yoksa ve atılması zorunlu ceza kartı da yoksa herhangi bir kart oynanabilir.
 • Açılan renge uyarken eldeki ceza kartı masadaki daha yüksek kart nedeniyle artık eli alamayacak durumdaysa, o ceza kartı oynanmak zorundadır.
 • Puanlanacak bütün ceza kartları oynandığında oyun 13 el tamamlanmadan sona erebilir.
 
@@ -214,6 +215,7 @@ namespace King.UI
 
 • Alınan her el +50 puandır.
 • Açılan renkten kart yoksa elde koz varsa koz atmak zorunludur.
+• Açılan renkten de kozdan da yoksa herhangi bir kart oynanabilir.
 • Ele kozla başlanmışsa ve masadaki en yüksek kozu geçebilecek koz varsa yükseltmek zorunludur.
 • Başka bir renge çakarken masadaki kozu yükseltmek zorunlu değildir.
 • Koz açılmadan normal olarak kozla ele başlanamaz. Elde yalnızca koz kaldığında kozla başlanabilir.
