@@ -51,7 +51,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(102f, 16f),
+                new Vector2(138f, 16f),
                 new Vector2(138f, 56f),
                 "",
                 64,
@@ -67,7 +67,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(88f, -274f),
+                new Vector2(124f, -274f),
                 new Vector2(120f, 48f),
                 "",
                 30,
@@ -113,7 +113,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(66f, -160f),
+                new Vector2(102f, -160f),
                 new Vector2(164f, 164f));
 
             contractIcon =
@@ -129,7 +129,7 @@ namespace King.UI
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(266f, -119f),
+                new Vector2(302f, -119f),
                 new Vector2(106f, 106f),
                 "",
                 82,
@@ -146,7 +146,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Contract icon center is x=128. Keep the King label on the
                 // same horizontal center and place it below the contract name.
-                new Vector2(298f, -114f),
+                new Vector2(310f, -128f),
                 new Vector2(200f, 68f),
                 "King",
                 54,
@@ -164,7 +164,7 @@ namespace King.UI
 
             var kingOutline = kingText.gameObject.AddComponent<Outline>();
             kingOutline.effectColor =
-                new Color(1f, 0.30f, 0f, 0.95f);
+                new Color(0.90f, 0.05f, 0.05f, 0.98f);
             kingOutline.effectDistance =
                 new Vector2(4f, -4f);
 
@@ -177,7 +177,7 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Show the current contract directly below its icon.
                 // x=28 with width=200 shares the icon's x=128 center.
-                new Vector2(48f, -216f),
+                new Vector2(84f, -216f),
                 new Vector2(200f, 36f),
                 "",
                 54,
