@@ -14,8 +14,14 @@ namespace King.UI
         BotDifficulty selected = BotDifficulty.Normal;
         float previousTimeScale = 1f;
 
+        static readonly Color PanelColor =
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
+
         static readonly Color NormalColor =
-            new Color(0.055f, 0.18f, 0.105f, 1f);
+            new Color(0.018f, 0.145f, 0.070f, 0.98f);
 
         static readonly Color SelectedColor =
             new Color(0.62f, 0.52f, 0.25f, 1f);
@@ -45,17 +51,25 @@ namespace King.UI
             dim.raycastTarget = true;
             overlay = root;
 
+            var panelBorder = UiKit.Rect(
+                "DifficultyPanelBorder",
+                rt,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(772f, 402f));
+
+            UiKit.RoundedImage(panelBorder, PanelBorder);
+
             var panel = UiKit.Rect(
                 "DifficultyPanel",
-                rt,
+                panelBorder,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 Vector2.zero,
                 new Vector2(760f, 390f));
 
-            UiKit.RoundedImage(
-                panel,
-                new Color(0.035f, 0.12f, 0.07f, 0.99f));
+            UiKit.RoundedImage(panel, PanelColor);
 
             var title = UiKit.Label(
                 "Title",
@@ -66,10 +80,30 @@ namespace King.UI
                 new Vector2(620f, 52f),
                 "Zorluk Seçimi",
                 36,
-                CardStyle.Gold,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             title.fontStyle = FontStyle.Bold;
+
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                panel,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(-250f, 125f),
+                new Vector2(110f, 3f));
+
+            UiKit.RoundedImage(leftLine, PanelBorder);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                panel,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(250f, 125f),
+                new Vector2(110f, 3f));
+
+            UiKit.RoundedImage(rightLine, PanelBorder);
 
             UiKit.Label(
                 "Message",
@@ -80,7 +114,7 @@ namespace King.UI
                 new Vector2(650f, 42f),
                 "Bilgisayar oyuncularının seviyesini seçin",
                 23,
-                CardStyle.Cream,
+                new Color(0.80f, 0.82f, 0.76f, 1f),
                 TextAnchor.MiddleCenter);
 
             string[] labels = { "Kolay", "Normal", "Zor" };
