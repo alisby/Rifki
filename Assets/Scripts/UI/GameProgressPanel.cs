@@ -19,7 +19,10 @@ namespace King.UI
         };
 
         static readonly Color PanelColor =
-            new Color(0.025f, 0.10f, 0.06f, 0.90f);
+            new Color(0.015f, 0.115f, 0.055f, 0.94f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
 
         static readonly Color RowColor =
             new Color(0.045f, 0.14f, 0.085f, 0.92f);
@@ -41,12 +44,22 @@ namespace King.UI
 
         public GameProgressPanel(Transform canvas)
         {
-            panel = UiKit.Rect(
-                "GameProgressPanel",
+            var panelBorder = UiKit.Rect(
+                "GameProgressPanelBorder",
                 canvas,
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
                 new Vector2(-190f, -18f),
+                new Vector2(336f, 282f));
+
+            UiKit.RoundedImage(panelBorder, PanelBorder);
+
+            panel = UiKit.Rect(
+                "GameProgressPanel",
+                panelBorder,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
                 new Vector2(330f, 276f));
 
             UiKit.RoundedImage(panel, PanelColor);
@@ -60,7 +73,7 @@ namespace King.UI
                 new Vector2(306f, 30f),
                 "Oyunlar",
                 27,
-                CardStyle.Gold,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             title.fontStyle = FontStyle.Bold;
