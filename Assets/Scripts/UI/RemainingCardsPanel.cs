@@ -7,7 +7,10 @@ namespace King.UI
     public sealed class RemainingCardsPanel
     {
         static readonly Color PanelColor =
-            new Color(0.025f, 0.085f, 0.05f, 0.98f);
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
 
         static readonly Color HeaderColor =
             new Color(0.075f, 0.14f, 0.095f, 1f);
@@ -75,12 +78,24 @@ namespace King.UI
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
-            var panelRect = UiKit.Rect(
-                "RemainingCards",
+            var panelBorderRect = UiKit.Rect(
+                "RemainingCardsBorder",
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 40f),
+                new Vector2(1192f, 402f));
+
+            UiKit.RoundedImage(
+                panelBorderRect,
+                PanelBorder);
+
+            var panelRect = UiKit.Rect(
+                "RemainingCards",
+                panelBorderRect,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
                 new Vector2(1180f, 390f));
 
             var background =
@@ -89,7 +104,7 @@ namespace King.UI
                     PanelColor);
 
             background.raycastTarget = true;
-            panel = panelRect.gameObject;
+            panel = panelBorderRect.gameObject;
 
             var cornerLogo =
                 RifkiBranding.AddCornerLogo(
@@ -99,7 +114,7 @@ namespace King.UI
             cornerLogo
                 .GetComponent<RectTransform>()
                 .anchoredPosition +=
-                    new Vector2(-132f, 132f);
+                    new Vector2(-132f, 160f);
 
             cornerLogo.SetActive(false);
 
@@ -112,11 +127,31 @@ namespace King.UI
                 new Vector2(1000f, 40f),
                 "Elde Kalan Kartlar",
                 28,
-                CardStyle.Gold,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             title.fontStyle =
                 FontStyle.Bold;
+
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                panelRect,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(-350f, -20f),
+                new Vector2(180f, 3f));
+
+            UiKit.RoundedImage(leftLine, PanelBorder);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                panelRect,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(350f, -20f),
+                new Vector2(180f, 3f));
+
+            UiKit.RoundedImage(rightLine, PanelBorder);
 
             int index = 0;
 
@@ -136,7 +171,7 @@ namespace King.UI
                     suitOrder[s];
 
                 float y =
-                    -72f - s * 58f;
+                    -100f - s * 68f;
 
                 Color rowColor =
                     s % 2 == 0
