@@ -22,6 +22,12 @@ namespace King.UI
             "Doğu"
         };
 
+        static readonly Color PanelColor =
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
+
         readonly GameObject overlay;
         readonly InputField[] fields = new InputField[4];
         readonly Action<string, string, string, string> onStart;
@@ -52,17 +58,25 @@ namespace King.UI
             dim.raycastTarget = true;
             overlay = root.gameObject;
 
+            var panelBorder = UiKit.Rect(
+                "PanelBorder",
+                overlay.transform,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(692f, 632f));
+
+            UiKit.RoundedImage(panelBorder, PanelBorder);
+
             var panel = UiKit.Rect(
                 "Panel",
-                overlay.transform,
+                panelBorder,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 Vector2.zero,
                 new Vector2(680f, 620f));
 
-            UiKit.RoundedImage(
-                panel,
-                new Color(0.07f, 0.19f, 0.11f, 0.98f));
+            UiKit.RoundedImage(panel, PanelColor);
 
             var playerNamesLogo =
                 RifkiBranding.AddCornerLogo(
@@ -86,6 +100,26 @@ namespace King.UI
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                panel,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(-185f, -34f),
+                new Vector2(70f, 3f));
+
+            UiKit.RoundedImage(leftLine, PanelBorder);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                panel,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(220f, -34f),
+                new Vector2(105f, 3f));
+
+            UiKit.RoundedImage(rightLine, PanelBorder);
+
             UiKit.Label(
                 "Info",
                 panel,
@@ -95,7 +129,7 @@ namespace King.UI
                 new Vector2(580f, 32f),
                 "İsimleri değiştirin veya yön adlarını bırakın",
                 21,
-                CardStyle.Cream,
+                new Color(0.80f, 0.82f, 0.76f, 1f),
                 TextAnchor.MiddleCenter);
 
             string[] labels =
