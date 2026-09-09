@@ -105,7 +105,7 @@ namespace King.UI
                 canvas,
                 Seat.North,
                 new Vector2(0.5f, 1f),
-                new Vector2(0f, -106f));
+                new Vector2(0f, -136f));
 
             BuildSeat(
                 canvas,
@@ -190,7 +190,7 @@ namespace King.UI
                 root,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-20f, -23f),
+                new Vector2(0f, -30f),
                 new Vector2(70f, 48f),
                 "0",
                 44,
@@ -205,7 +205,7 @@ namespace King.UI
                 root,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(42f, -23f),
+                new Vector2(0f, 70f),
                 new Vector2(50f, 48f),
                 "★",
                 42,
