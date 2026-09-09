@@ -22,7 +22,7 @@ namespace King.UI
                 canvas,
                 Vector2.one,
                 Vector2.one,
-                new Vector2(-24f, -246f),
+                new Vector2(-24f, -260f),
                 new Vector2(150f, 48f));
 
             var toggleImage = UiKit.RoundedImage(

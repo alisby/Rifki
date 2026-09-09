@@ -418,6 +418,7 @@ namespace King.UI
                     // a coin toss.
                     handView.Show(hands[(int)Seat.South]);
                     handView.DisableAll();
+                    gameProgress.Refresh(session);
                     statusLine.Set($"El {session.DealNumber}/{Session.DealCount}");
                     ContractCall? picked = null;
                     picker.Show(session, available, c => picked = c);
@@ -579,6 +580,7 @@ namespace King.UI
                 }
 
                 deal = session.StartDeal(call);
+                gameProgress.Refresh(session);
                 statusLine.SetKingDeclared(call.KingDeclared);
                 trickView.MarkCaller(session.Caller);
                 playerHud.MarkCaller(session.Caller);
@@ -698,7 +700,7 @@ namespace King.UI
                 canvas,
                 Vector2.one,
                 Vector2.one,
-                new Vector2(-24f, -72f),
+                new Vector2(-24f, -86f),
                 new Vector2(150f, 48f));
 
             var image = UiKit.RoundedImage(
@@ -725,7 +727,7 @@ namespace King.UI
                 canvas,
                 Vector2.one,
                 Vector2.one,
-                new Vector2(-24f, -14f),
+                new Vector2(-24f, -28f),
                                   new Vector2(150f, 48f));
 
             var image = UiKit.RoundedImage(

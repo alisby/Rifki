@@ -28,6 +28,8 @@ namespace King.UI
             new Color(0.045f, 0.14f, 0.085f, 0.92f);
 
         readonly RectTransform panel;
+        readonly Text dealCounter;
+
         readonly RectTransform[] rows =
             new RectTransform[Types.Length];
 
@@ -49,7 +51,7 @@ namespace King.UI
                 canvas,
                 new Vector2(1f, 1f),
                 new Vector2(1f, 1f),
-                new Vector2(-190f, -18f),
+                new Vector2(-190f, -32f),
                 new Vector2(336f, 282f));
 
             UiKit.RoundedImage(panelBorder, PanelBorder);
@@ -67,16 +69,32 @@ namespace King.UI
             var title = UiKit.Label(
                 "Title",
                 panel,
-                new Vector2(0.5f, 1f),
-                new Vector2(0.5f, 1f),
-                new Vector2(0f, -10f),
-                new Vector2(306f, 30f),
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(StartX + 2f, -10f),
+                new Vector2(RowWidth, 30f),
                 "Oyunlar",
                 27,
-                CardStyle.Cream,
-                TextAnchor.MiddleCenter);
+                new Color(1f, 0.82f, 0.18f, 1f),
+                TextAnchor.MiddleLeft);
 
             title.fontStyle = FontStyle.Bold;
+
+            dealCounter = UiKit.Label(
+                "DealCounter",
+                panel,
+                new Vector2(0f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(
+                    StartX + RowWidth + ColumnGap,
+                    -10f),
+                new Vector2(RowWidth, 30f),
+                "",
+                27,
+                new Color(1f, 0.82f, 0.18f, 1f),
+                TextAnchor.MiddleRight);
+
+            dealCounter.fontStyle = FontStyle.Bold;
 
             for (int i = 0; i < Types.Length; i++)
             {
@@ -122,6 +140,9 @@ namespace King.UI
 
         public void Refresh(Session session)
         {
+            dealCounter.text =
+                session.DealNumber + "/" + Session.DealCount;
+
             for (int i = 0; i < Types.Length; i++)
             {
                 int played =

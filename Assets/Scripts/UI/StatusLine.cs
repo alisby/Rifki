@@ -61,21 +61,28 @@ namespace King.UI
             dealText.fontStyle =
                 FontStyle.Bold;
 
+            // Oyun sayacı artık Oyunlar panelinde.
+            dealText.gameObject.SetActive(false);
+
 
             difficultyText = UiKit.Label(
                 "DifficultyText",
                 box,
                 new Vector2(0f, 0f),
                 new Vector2(0f, 0f),
-                new Vector2(124f, -274f),
-                new Vector2(120f, 48f),
+                new Vector2(84f, -216f),
+                new Vector2(200f, 36f),
                 "",
-                30,
+                54,
                 CardStyle.Gold,
                 TextAnchor.MiddleCenter);
 
             difficultyText.fontStyle =
                 FontStyle.Bold;
+
+            difficultyText.resizeTextForBestFit = true;
+            difficultyText.resizeTextMinSize = 20;
+            difficultyText.resizeTextMaxSize = 27;
 
             callerText = UiKit.Label(
                 "Caller",
@@ -146,8 +153,8 @@ namespace King.UI
                 new Vector2(0f, 0f),
                 // Contract icon center is x=128. Keep the King label on the
                 // same horizontal center and place it below the contract name.
-                new Vector2(310f, -128f),
-                new Vector2(200f, 68f),
+                new Vector2(115f, 16f),
+                new Vector2(138f, 56f),
                 "King",
                 54,
                 CardStyle.Gold,
@@ -190,6 +197,9 @@ namespace King.UI
             contractText.resizeTextForBestFit = true;
             contractText.resizeTextMinSize = 20;
             contractText.resizeTextMaxSize = 27;
+
+            // Kontrat adı artık gösterilmiyor; simge yeterli.
+            contractText.gameObject.SetActive(false);
 
             contractIcon.gameObject.SetActive(false);
             trumpGlyph.gameObject.SetActive(false);
