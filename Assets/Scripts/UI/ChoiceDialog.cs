@@ -6,6 +6,12 @@ namespace King.UI
 {
     public sealed class ChoiceDialog
     {
+        static readonly Color PanelColor =
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
+
         readonly GameObject overlay;
         readonly Text titleText;
         readonly Text messageText;
@@ -28,33 +34,66 @@ namespace King.UI
             shade.color = new Color(0f, 0f, 0f, 0.65f);
             shade.raycastTarget = true;
 
-            var panel = UiKit.Rect(
-                "ChoicePanel",
+            var panelBorder = UiKit.Rect(
+                "ChoicePanelBorder",
                 overlayRect,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 Vector2.zero,
-                new Vector2(650f, 290f));
+                new Vector2(742f, 330f));
 
-            UiKit.RoundedImage(panel, new Color(0.018f, 0.09f, 0.05f, 1f));
+            UiKit.RoundedImage(panelBorder, PanelBorder);
+
+            var panel = UiKit.Rect(
+                "ChoicePanel",
+                panelBorder,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(730f, 318f));
+
+            UiKit.RoundedImage(panel, PanelColor);
 
             titleText = UiKit.Label(
                 "Title", panel,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 88f), new Vector2(560f, 52f),
-                "", 38, CardStyle.Gold, TextAnchor.MiddleCenter);
+                "", 38, CardStyle.Cream, TextAnchor.MiddleCenter);
             titleText.fontStyle = FontStyle.Bold;
+
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                panel,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(-220f, 88f),
+                new Vector2(90f, 3f));
+
+            UiKit.RoundedImage(leftLine, PanelBorder);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                panel,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(220f, 88f),
+                new Vector2(90f, 3f));
+
+            UiKit.RoundedImage(rightLine, PanelBorder);
 
             messageText = UiKit.Label(
                 "Message", panel,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 24f), new Vector2(570f, 78f),
-                "", 29, CardStyle.Cream, TextAnchor.MiddleCenter);
+                new Vector2(0f, 20f), new Vector2(630f, 88f),
+                "", 25, CardStyle.Cream, TextAnchor.MiddleCenter);
+
+            messageText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            messageText.verticalOverflow = VerticalWrapMode.Overflow;
 
             var leftRect = UiKit.Rect(
                 "LeftChoice", panel,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-150f, -82f), new Vector2(250f, 64f));
+                new Vector2(-165f, -96f), new Vector2(250f, 64f));
             var leftImage = UiKit.RoundedImage(leftRect, new Color(0.055f, 0.18f, 0.105f, 1f));
             var leftButton = UiKit.MakeButton(leftImage);
             leftText = UiKit.Fill("Label", leftRect, "", 28, CardStyle.Cream, TextAnchor.MiddleCenter);
@@ -64,7 +103,7 @@ namespace King.UI
             var rightRect = UiKit.Rect(
                 "RightChoice", panel,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(150f, -82f), new Vector2(250f, 64f));
+                new Vector2(165f, -96f), new Vector2(250f, 64f));
             var rightImage = UiKit.RoundedImage(rightRect, new Color(0.055f, 0.18f, 0.105f, 1f));
             var rightButton = UiKit.MakeButton(rightImage);
             rightText = UiKit.Fill("Label", rightRect, "", 28, CardStyle.Cream, TextAnchor.MiddleCenter);
