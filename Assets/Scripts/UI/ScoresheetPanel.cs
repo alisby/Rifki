@@ -20,7 +20,10 @@ namespace King.UI
         };
 
         static readonly Color PanelColor =
-            new Color(0.025f, 0.085f, 0.05f, 0.98f);
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
 
         static readonly Color HeaderColor =
             new Color(0.075f, 0.14f, 0.095f, 1f);
@@ -47,10 +50,10 @@ namespace King.UI
             new Color(0.36f, 0.58f, 0.94f, 1f);
 
         static readonly Color InactiveTabColor =
-            new Color(0.055f, 0.12f, 0.075f, 1f);
+            new Color(0.018f, 0.145f, 0.070f, 0.98f);
 
         static readonly Color ActiveTabColor =
-            new Color(0.16f, 0.25f, 0.16f, 1f);
+            new Color(0.62f, 0.52f, 0.25f, 1f);
 
         readonly GameObject panel;
         readonly GameObject summaryPage;
@@ -90,19 +93,31 @@ namespace King.UI
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
-            var panelRect = UiKit.Rect(
-                "Scoresheet",
+            var panelBorderRect = UiKit.Rect(
+                "ScoresheetBorder",
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 30f),
+                new Vector2(982f, 652f));
+
+            UiKit.RoundedImage(
+                panelBorderRect,
+                PanelBorder);
+
+            var panelRect = UiKit.Rect(
+                "Scoresheet",
+                panelBorderRect,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
                 new Vector2(970f, 640f));
 
             var background =
                 UiKit.RoundedImage(panelRect, PanelColor);
 
             background.raycastTarget = true;
-            panel = panelRect.gameObject;
+            panel = panelBorderRect.gameObject;
 
             cornerLogo =
                 RifkiBranding.AddCornerLogo(
@@ -136,7 +151,7 @@ namespace King.UI
                 summaryTabRect,
                 "Özet",
                 23,
-                CardStyle.Gold,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             var historyTabRect = UiKit.Rect(
