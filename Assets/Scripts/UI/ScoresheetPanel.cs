@@ -127,7 +127,7 @@ namespace King.UI
             cornerLogo
                 .GetComponent<RectTransform>()
                 .anchoredPosition +=
-                    new Vector2(-132f, 132f);
+                    new Vector2(-132f, 156f);
 
             // Sekmeler
             var summaryTabRect = UiKit.Rect(
