@@ -53,10 +53,10 @@ namespace King.UI
             new Color(0.84f, 0.82f, 0.70f, 1f);
 
         static readonly Color PanelColor =
-        new Color(0.07f, 0.19f, 0.11f, 0.98f);
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
 
         static readonly Color GoldFrameColor =
-        new Color(0.88f, 0.70f, 0.28f, 1f);
+            new Color(0.72f, 0.54f, 0.18f, 1f);
 
         static readonly Color GoldTextColor =
         new Color(0.97f, 0.86f, 0.52f, 1f);
@@ -107,13 +107,23 @@ namespace King.UI
             dim.raycastTarget = true;
             overlay = dim.gameObject;
 
-            var panel = UiKit.Rect(
-                "Panel",
+            var panelBorder = UiKit.Rect(
+                "PanelBorder",
                 overlay.transform,
                 Half,
                 Half,
                 new Vector2(0f, 55f),
-                                   new Vector2(700f, 690f));
+                new Vector2(712f, 702f));
+
+            UiKit.RoundedImage(panelBorder, GoldFrameColor);
+
+            var panel = UiKit.Rect(
+                "Panel",
+                panelBorder,
+                Half,
+                Half,
+                Vector2.zero,
+                new Vector2(700f, 690f));
 
             UiKit.RoundedImage(panel, PanelColor);
 
@@ -155,6 +165,25 @@ namespace King.UI
                         34,
                         CardStyle.Cream,
                         TextAnchor.MiddleCenter);
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                page,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(-205f, -28f),
+                new Vector2(90f, 3f));
+
+            UiKit.RoundedImage(leftLine, GoldFrameColor);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                page,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(205f, -28f),
+                new Vector2(90f, 3f));
+
+            UiKit.RoundedImage(rightLine, GoldFrameColor);
 
             UiKit.Label(
                 "Subtitle",
@@ -165,7 +194,7 @@ namespace King.UI
                         new Vector2(600f, 28f),
                         "Üstte koz, altta ceza kontratları",
                         20,
-                        GoldTextColor,
+                        new Color(0.80f, 0.82f, 0.76f, 1f),
                         TextAnchor.MiddleCenter);
 
             float[] suitX =
