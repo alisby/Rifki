@@ -9,6 +9,12 @@ namespace King.UI
         readonly ScrollRect scrollRect;
         float previousTimeScale = 1f;
 
+        static readonly Color PanelColor =
+            new Color(0.015f, 0.115f, 0.055f, 0.985f);
+
+        static readonly Color PanelBorder =
+            new Color(0.72f, 0.54f, 0.18f, 1f);
+
         public RulesPanel(Transform canvas)
         {
             var toggleRect = UiKit.Rect(
@@ -58,6 +64,21 @@ namespace King.UI
             overlayImage.raycastTarget = true;
             overlay = overlayGo;
 
+            var panelBorderGo = new GameObject(
+                "RulesPanelBorder",
+                typeof(RectTransform));
+
+            var panelBorder =
+                (RectTransform)panelBorderGo.transform;
+
+            panelBorder.SetParent(overlayRect, false);
+            panelBorder.anchorMin = new Vector2(0.04f, 0.05f);
+            panelBorder.anchorMax = new Vector2(0.96f, 0.95f);
+            panelBorder.offsetMin = Vector2.zero;
+            panelBorder.offsetMax = Vector2.zero;
+
+            UiKit.RoundedImage(panelBorder, PanelBorder);
+
             var panelGo = new GameObject(
                 "RulesPanel",
                 typeof(RectTransform));
@@ -65,15 +86,13 @@ namespace King.UI
             var panel =
                 (RectTransform)panelGo.transform;
 
-            panel.SetParent(overlayRect, false);
-            panel.anchorMin = new Vector2(0.04f, 0.05f);
-            panel.anchorMax = new Vector2(0.96f, 0.95f);
-            panel.offsetMin = Vector2.zero;
-            panel.offsetMax = Vector2.zero;
+            panel.SetParent(panelBorder, false);
+            panel.anchorMin = Vector2.zero;
+            panel.anchorMax = Vector2.one;
+            panel.offsetMin = new Vector2(6f, 6f);
+            panel.offsetMax = new Vector2(-6f, -6f);
 
-            UiKit.RoundedImage(
-                panel,
-                new Color(0.035f, 0.12f, 0.07f, 0.995f));
+            UiKit.RoundedImage(panel, PanelColor);
 
             var title = UiKit.Label(
                 "Title",
@@ -84,10 +103,30 @@ namespace King.UI
                 new Vector2(760f, 54f),
                 "Oyun Kuralları",
                 36,
-                CardStyle.Gold,
+                CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             title.fontStyle = FontStyle.Bold;
+
+            var leftLine = UiKit.Rect(
+                "TitleLineLeft",
+                panel,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(-430f, -35f),
+                new Vector2(160f, 3f));
+
+            UiKit.RoundedImage(leftLine, PanelBorder);
+
+            var rightLine = UiKit.Rect(
+                "TitleLineRight",
+                panel,
+                new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f),
+                new Vector2(430f, -35f),
+                new Vector2(160f, 3f));
+
+            UiKit.RoundedImage(rightLine, PanelBorder);
 
             var closeRect = UiKit.Rect(
                 "Close",
