@@ -639,7 +639,7 @@ namespace King.UI
 
             var image = UiKit.RoundedImage(
                 rect,
-                new Color(0.28f, 0.07f, 0.08f, 0.95f));
+                new Color(0.28f, 0.07f, 0.08f, 0.92f));
 
             var button = UiKit.MakeButton(image);
 
@@ -666,7 +666,7 @@ namespace King.UI
 
             var image = UiKit.RoundedImage(
                 rect,
-                new Color(0.06f, 0.15f, 0.25f, 0.95f));
+                new Color(0.06f, 0.15f, 0.25f, 0.92f));
 
             var button = UiKit.MakeButton(image);
 
@@ -676,7 +676,7 @@ namespace King.UI
                 Screen.fullScreenMode == FullScreenMode.Windowed
                 ? "Tam Ekran"
                 : "Pencere",
-                22,
+                24,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
