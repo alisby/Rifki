@@ -16,16 +16,39 @@ namespace King.UI
 
         public NoticeBanner(Transform canvas)
         {
-            var rt = UiKit.Rect(
-                "Notice",
+            var border = UiKit.Rect(
+                "NoticeBorder",
                 canvas,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 48f),
+                new Vector2(652f, 74f));
+
+            UiKit.RoundedImage(
+                border,
+                new Color(0.72f, 0.54f, 0.18f, 1f));
+
+            var rt = UiKit.Rect(
+                "Notice",
+                border,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
                 new Vector2(640f, 62f));
-            UiKit.RoundedImage(rt, new Color(0.04f, 0.12f, 0.07f, 0.94f));
-            text = UiKit.Fill("Text", rt, "", 30, CardStyle.Gold, TextAnchor.MiddleCenter);
-            root = rt.gameObject;
+
+            UiKit.RoundedImage(
+                rt,
+                new Color(0.015f, 0.115f, 0.055f, 0.96f));
+
+            text = UiKit.Fill(
+                "Text",
+                rt,
+                "",
+                30,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
+
+            root = border.gameObject;
             root.SetActive(false);
         }
 
