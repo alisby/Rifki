@@ -254,7 +254,6 @@ namespace King.UI
                 int total = totals[seat];
 
                 bool isWinner = total == bestTotal;
-                bool isLoser = total < 0 && !isWinner;
 
                 rowNames[i].text = GameText.SeatLabel((Seat)seat);
                 rowScores[i].text = total.ToString();
@@ -289,8 +288,7 @@ namespace King.UI
             rowScores[index].color =
                 new Color(0.34f, 0.78f, 0.94f, 1f);
 
-            rowIcons[index].text = "🏆";
-            rowIcons[index].color = CardStyle.Cream;
+            rowIcons[index].text = "";
         }
 
         void SetLoserStyle(int index)
@@ -305,13 +303,12 @@ namespace King.UI
                 new Vector2(914f, 56f);
 
             rowNames[index].color =
-                new Color(1f, 0.86f, 0.18f, 1f);
+                new Color(1f, 0.38f, 0.34f, 1f);
 
             rowScores[index].color =
-                new Color(1f, 0.86f, 0.18f, 1f);
+                new Color(1f, 0.38f, 0.34f, 1f);
 
-            rowIcons[index].text = "😭";
-            rowIcons[index].color = CardStyle.Cream;
+            rowIcons[index].text = "";
         }
 
         void SetNormalStyle(int index)
@@ -353,8 +350,7 @@ namespace King.UI
             rowBackgroundRects[index].sizeDelta = new Vector2(922f, 64f);
             rowNames[index].color = new Color(0.34f, 0.78f, 0.94f, 1f);
             rowScores[index].color = new Color(0.34f, 0.78f, 0.94f, 1f);
-            rowIcons[index].text = "🏆";
-            rowIcons[index].color = CardStyle.Cream;
+            rowIcons[index].text = "";
         }
 
         void SetKingBattiStyle(int index)
@@ -362,10 +358,9 @@ namespace King.UI
             rowBorders[index].color = new Color(0.76f, 0.08f, 0.06f, 1f);
             rowBackgrounds[index].color = new Color(0.25f, 0.005f, 0.005f, 0.98f);
             rowBackgroundRects[index].sizeDelta = new Vector2(914f, 56f);
-            rowNames[index].color = new Color(1f, 0.86f, 0.18f, 1f);
-            rowScores[index].color = new Color(1f, 0.86f, 0.18f, 1f);
-            rowIcons[index].text = "😭";
-            rowIcons[index].color = CardStyle.Cream;
+            rowNames[index].color = new Color(1f, 0.38f, 0.34f, 1f);
+            rowScores[index].color = new Color(1f, 0.38f, 0.34f, 1f);
+            rowIcons[index].text = "";
         }
 
         void ShowKingResult(Session session)
