@@ -87,7 +87,18 @@ namespace King.UI
             if (Input.GetKeyDown(KeyCode.F11))
                 ToggleFullscreen();
 
+#if UNITY_EDITOR
+            if (Input.GetKeyDown(KeyCode.F9))
+                PreviewUi();
+#endif
         }
+
+#if UNITY_EDITOR
+        void PreviewUi()
+        {
+            // Geçici UI önizlemeleri burada.
+        }
+#endif
 
 
         void BeginGame(string south, string west, string north, string east)
