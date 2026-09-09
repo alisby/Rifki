@@ -22,7 +22,7 @@ namespace King.UI
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 48f),
-                new Vector2(652f, 74f));
+                new Vector2(760f, 100f));
 
             UiKit.RoundedImage(
                 border,
@@ -34,7 +34,7 @@ namespace King.UI
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 Vector2.zero,
-                new Vector2(640f, 62f));
+                new Vector2(748f, 88f));
 
             UiKit.RoundedImage(
                 rt,
@@ -44,9 +44,13 @@ namespace King.UI
                 "Text",
                 rt,
                 "",
-                30,
+                24,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
+
+            text.horizontalOverflow = HorizontalWrapMode.Wrap;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
+            text.lineSpacing = 0.92f;
 
             root = border.gameObject;
             root.SetActive(false);
