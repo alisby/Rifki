@@ -70,6 +70,9 @@ namespace King.UI
         readonly Text[] totalScores =
             new Text[4];
 
+        readonly Text[] headerScores =
+            new Text[4];
+
         readonly Image[,] penalty =
             new Image[4, 3];
 
@@ -143,7 +146,7 @@ namespace King.UI
                 anchor,
                 new Vector2(0.5f, 0.5f),
                 position,
-                new Vector2(300f, 100f));
+                new Vector2(370f, 136f));
 
             BuildHeader(seat);
             details[s] = BuildDetails(seat);
@@ -155,13 +158,53 @@ namespace King.UI
             int s = (int)seat;
             var root = roots[s];
 
+            var frame = UiKit.Rect(
+                "HudFrame",
+                root,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(360f, 136f));
+
+            var frameImage =
+                UiKit.RoundedImage(frame, GoldBorder);
+            frameImage.raycastTarget = false;
+
+            var body = UiKit.Rect(
+                "HudBody",
+                frame,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                Vector2.zero,
+                new Vector2(352f, 128f));
+
+            var bodyImage =
+                UiKit.RoundedImage(body, PanelColor);
+            bodyImage.raycastTarget = false;
+
+            callerStars[s] = UiKit.Label(
+                "CallerStar",
+                root,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 43f),
+                new Vector2(50f, 32f),
+                "★",
+                30,
+                Gold,
+                TextAnchor.MiddleCenter);
+
+            callerStars[s].fontStyle = FontStyle.Bold;
+            AddShadow(callerStars[s]);
+            callerStars[s].gameObject.SetActive(false);
+
             var nameHit = UiKit.Rect(
                 "PlayerNameButton",
                 root,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 20f),
-                new Vector2(270f, 50f));
+                new Vector2(0f, 5f),
+                new Vector2(330f, 46f));
 
             var hitImage = UiKit.RoundedImage(
                 nameHit,
@@ -175,14 +218,15 @@ namespace King.UI
                 "PlayerName",
                 nameHit,
                 GameText.SeatLabel(seat),
-                40,
+                36,
                 CardStyle.Cream,
                 TextAnchor.MiddleCenter);
 
             name.fontStyle = FontStyle.Bold;
             name.resizeTextForBestFit = true;
-            name.resizeTextMinSize = 27;
-            name.resizeTextMaxSize = 40;
+            name.resizeTextMinSize = 18;
+            name.resizeTextMaxSize = 36;
+            name.verticalOverflow = VerticalWrapMode.Truncate;
             AddShadow(name);
 
             dealCounts[s] = UiKit.Label(
@@ -190,31 +234,48 @@ namespace King.UI
                 root,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -30f),
-                new Vector2(70f, 48f),
+                new Vector2(-63f, -41f),
+                new Vector2(80f, 36f),
                 "0",
-                44,
+                30,
                 PenaltyCountColor,
                 TextAnchor.MiddleCenter);
 
             dealCounts[s].fontStyle = FontStyle.Bold;
             AddShadow(dealCounts[s]);
 
-            callerStars[s] = UiKit.Label(
-                "CallerStar",
+            var slash = UiKit.Label(
+                "ScoreSeparator",
                 root,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 70f),
-                new Vector2(50f, 48f),
-                "★",
-                42,
-                Gold,
+                new Vector2(-10f, -41f),
+                new Vector2(34f, 36f),
+                "/",
+                27,
+                MutedText,
                 TextAnchor.MiddleCenter);
 
-            callerStars[s].fontStyle = FontStyle.Bold;
-            AddShadow(callerStars[s]);
-            callerStars[s].gameObject.SetActive(false);
+            slash.fontStyle = FontStyle.Bold;
+            AddShadow(slash);
+
+            headerScores[s] = UiKit.Label(
+                "HeaderTotalScore",
+                root,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(65f, -41f),
+                new Vector2(120f, 36f),
+                "0",
+                30,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
+
+            headerScores[s].fontStyle = FontStyle.Bold;
+            headerScores[s].resizeTextForBestFit = true;
+            headerScores[s].resizeTextMinSize = 22;
+            headerScores[s].resizeTextMaxSize = 30;
+            AddShadow(headerScores[s]);
         }
 
         RectTransform BuildDetails(Seat seat)
@@ -253,9 +314,19 @@ namespace King.UI
                 new Vector2(0.5f, 0.5f),
                 pivot,
                 position,
-                new Vector2(540f, 500f));
+                new Vector2(540f, 560f));
 
             UiKit.RoundedImage(frame, GoldBorder);
+
+            var detailsCanvas =
+                frame.gameObject.GetComponent<Canvas>();
+
+            if (detailsCanvas == null)
+                detailsCanvas =
+                    frame.gameObject.AddComponent<Canvas>();
+
+            detailsCanvas.overrideSorting = true;
+            detailsCanvas.sortingOrder = 50;
 
             var body = UiKit.Rect(
                 "Body",
@@ -263,9 +334,27 @@ namespace King.UI
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
                 Vector2.zero,
-                new Vector2(528f, 488f));
+                new Vector2(528f, 548f));
 
             UiKit.RoundedImage(body, PanelColor);
+
+            var playerTitle = UiKit.Label(
+                "PlayerDetailsTitle",
+                body,
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 255f),
+                new Vector2(470f, 34f),
+                GameText.SeatLabel(seat),
+                30,
+                CardStyle.Cream,
+                TextAnchor.MiddleCenter);
+
+            playerTitle.fontStyle = FontStyle.Bold;
+            playerTitle.resizeTextForBestFit = true;
+            playerTitle.resizeTextMinSize = 20;
+            playerTitle.resizeTextMaxSize = 30;
+            AddShadow(playerTitle);
 
             BuildSummary(body, seat);
 
@@ -422,7 +511,7 @@ namespace King.UI
                 parent,
                 new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f),
-                new Vector2(-206f, y),
+                new Vector2(-194f, y),
                 new Vector2(120f, 28f),
                 title,
                 20,
@@ -602,6 +691,12 @@ namespace King.UI
                         : score < 0
                             ? PenaltyCountColor
                             : CardStyle.Cream;
+
+                headerScores[s].text =
+                    totalScores[s].text;
+
+                headerScores[s].color =
+                    totalScores[s].color;
             }
         }
 

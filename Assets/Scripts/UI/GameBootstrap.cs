@@ -28,8 +28,6 @@ namespace King.UI
         OpponentsView opponentsView;
         StatusLine statusLine;
         GameProgressPanel gameProgress;
-        PlayerQuotaView playerQuota;
-        CapturedCardsView capturedCards;
         ScoresheetPanel scoresheet;
         RemainingCardsPanel remainingCards;
         NoticeBanner banner;
@@ -90,56 +88,7 @@ namespace King.UI
             if (Input.GetKeyDown(KeyCode.F11))
                 ToggleFullscreen();
 
-#if UNITY_EDITOR
-            if (Input.GetKeyDown(KeyCode.F9))
-                PreviewUi();
-#endif
         }
-
-#if UNITY_EDITOR
-        void PreviewUi()
-        {
-            // Geçici UI önizlemeleri burada.
-        }
-#endif
-
-        void SetLegacyPlayerHudVisible(bool visible)
-        {
-            string[] prefixes =
-            {
-                "South", "West", "North", "East"
-            };
-
-            string[] suffixes =
-            {
-                "InfoPanel",
-                "Label",
-                "Quota",
-                "CapturedCards"
-            };
-
-            var transforms =
-                canvas.GetComponentsInChildren<Transform>(true);
-
-            foreach (string prefix in prefixes)
-            {
-                foreach (string suffix in suffixes)
-                {
-                    string targetName =
-                        prefix + suffix;
-
-                    foreach (Transform item in transforms)
-                    {
-                        if (item.name != targetName)
-                            continue;
-
-                        item.gameObject.SetActive(visible);
-                        break;
-                    }
-                }
-            }
-        }
-
 
         void BeginGame(string south, string west, string north, string east)
         {
@@ -170,10 +119,7 @@ namespace King.UI
                 difficulty == BotDifficulty.Hard ? "Zor" :
                 "Normal");
             gameProgress = new GameProgressPanel(canvas);
-            playerQuota = new PlayerQuotaView(canvas);
-            capturedCards = new CapturedCardsView(canvas);
             playerHud = new PlayerHudView(canvas);
-            SetLegacyPlayerHudVisible(false);
             BuildNewGameButton();
             BuildFullscreenButton();
             new RulesPanel(canvas);
@@ -193,7 +139,6 @@ namespace King.UI
 
             session = new Session(seed);
             gameProgress.Refresh(session);
-            playerQuota.Refresh(session);
             playerHud.Refresh(session);
             scoresheet.Refresh(session);
 
@@ -582,22 +527,16 @@ namespace King.UI
                 deal = session.StartDeal(call);
                 gameProgress.Refresh(session);
                 statusLine.SetKingDeclared(call.KingDeclared);
-                trickView.MarkCaller(session.Caller);
                 playerHud.MarkCaller(session.Caller);
                 remainingCards.Refresh(deal);
-                playerQuota.Refresh(session);
                 playerHud.Refresh(session);
-                playerQuota.RefreshDeal(deal);
                 playerHud.RefreshDeal(deal);
                 yield return RunDeal();
 
                 if (deal.QueensSplitOneEach)
                 {
-                    playerQuota.ClearDealCounts();
-                    capturedCards.Clear();
                     playerHud.ClearDeal();
                     session.CancelDeal();
-                    playerQuota.Refresh(session);
                     playerHud.Refresh(session);
 
                     banner.Flash(
@@ -609,12 +548,8 @@ namespace King.UI
                     deal = null;
                     continue;
                 }
-
-                playerQuota.ClearDealCounts();
-                capturedCards.Clear();
                 playerHud.ClearDeal();
                 session.FinishDeal();
-                playerQuota.Refresh(session);
                 playerHud.Refresh(session);
                 gameProgress.Refresh(session);
                 scoresheet.Refresh(session);
@@ -628,8 +563,6 @@ namespace King.UI
             bool heartsMatter = deal.Contract.Type == ContractType.NoHearts
                 || deal.Contract.Type == ContractType.KingOfHearts;
             trickView.Clear();
-            capturedCards.Refresh(deal);
-            playerHud.RefreshDeal(deal);
             RefreshTable();
             while (!deal.IsComplete)
             {
@@ -665,10 +598,6 @@ namespace King.UI
                     yield return new WaitForSeconds(
                         TrickLinger);
                     trickView.Clear();
-                    capturedCards.Refresh(deal);
-                    playerHud.RefreshDeal(deal);
-                    // Clear() resets all four seat labels, so re-mark whoever leads next.
-                    trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
                 }
             }
         }
@@ -677,11 +606,9 @@ namespace King.UI
         {
             handView.Show(deal.HandOf(Seat.South));
             opponentsView.Refresh(deal);
-            playerQuota.RefreshDeal(deal);
             playerHud.RefreshDeal(deal);
             remainingCards.Refresh(deal);
             trickView.ShowCurrent(deal.CurrentTrick);
-            trickView.MarkTurn(deal.IsComplete ? (Seat?)null : deal.ToPlay);
             statusLine.Set(StatusText());
         }
 
