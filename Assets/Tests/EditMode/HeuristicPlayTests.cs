@@ -170,6 +170,87 @@ namespace King.Tests
             Assert.AreEqual(13, deal.TrickNumber);
         }
 
+
+        [Test]
+        public void HardSecondSeatDoesNotFallBackToNormalPenaltyPlay()
+        {
+            var south = Suited(Suit.Clubs);
+            var west = Suited(Suit.Diamonds);
+
+            Swap(
+                south,
+                west,
+                C(Suit.Clubs, Rank.Queen),
+                C(Suit.Diamonds, Rank.Three));
+
+            Swap(
+                south,
+                west,
+                C(Suit.Clubs, Rank.Jack),
+                C(Suit.Diamonds, Rank.Two));
+
+            var deal = new DealEngine(
+                new ContractCall(ContractType.NoTricks),
+                Hands(
+                    south,
+                    west,
+                    Suited(Suit.Hearts),
+                    Suited(Suit.Spades)),
+                Seat.South);
+
+            deal.Play(C(Suit.Clubs, Rank.Ten));
+
+            var normal =
+                new HeuristicAgent(
+                    21, BotDifficulty.Normal)
+                    .ChooseCard(deal, Seat.West);
+
+            var hard =
+                new HeuristicAgent(
+                    21, BotDifficulty.Hard)
+                    .ChooseCard(deal, Seat.West);
+
+            Assert.AreEqual(
+                C(Suit.Clubs, Rank.Jack), normal);
+
+            Assert.AreEqual(
+                C(Suit.Clubs, Rank.Queen), hard);
+        }
+
+
+        [Test]
+        public void HardDumpsAceOfHeartsWhenVoidInKingOfHearts()
+        {
+            var west = Suited(Suit.Hearts);
+            var east = Suited(Suit.Spades);
+
+            Swap(
+                west,
+                east,
+                C(Suit.Hearts, Rank.King),
+                C(Suit.Spades, Rank.Ace));
+
+            var deal = new DealEngine(
+                new ContractCall(
+                    ContractType.KingOfHearts),
+                Hands(
+                    Suited(Suit.Clubs),
+                    west,
+                    Suited(Suit.Diamonds),
+                    east),
+                Seat.South);
+
+            deal.Play(C(Suit.Clubs, Rank.Two));
+
+            var pick =
+                new HeuristicAgent(
+                    7, BotDifficulty.Hard)
+                    .ChooseCard(deal, Seat.West);
+
+            Assert.AreEqual(
+                C(Suit.Hearts, Rank.Ace), pick);
+        }
+
         [Test]
         public void StrongTrumpHolderLeadsTheBossTrump()
         {

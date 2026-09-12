@@ -181,6 +181,43 @@ namespace King.Tests
             }
         }
 
+
+        [Test]
+        public void HardUsesStricterTrumpThresholdThanNormal()
+        {
+            var session = new Session(17);
+            var hand = Hand(
+                C(Suit.Spades, Rank.Ace), C(Suit.Spades, Rank.King),
+                C(Suit.Spades, Rank.Queen), C(Suit.Spades, Rank.Seven),
+                C(Suit.Hearts, Rank.Ace), C(Suit.Hearts, Rank.Six),
+                C(Suit.Hearts, Rank.Four),
+                C(Suit.Clubs, Rank.Nine), C(Suit.Clubs, Rank.Five),
+                C(Suit.Clubs, Rank.Three),
+                C(Suit.Diamonds, Rank.Eight), C(Suit.Diamonds, Rank.Four),
+                C(Suit.Diamonds, Rank.Two));
+
+            var menu = new[]
+            {
+                ContractType.NoTricks,
+                ContractType.Trump
+            };
+
+            var normal =
+                new HeuristicAgent(
+                    17, BotDifficulty.Normal)
+                    .ChooseContract(session, hand, menu);
+
+            var hard =
+                new HeuristicAgent(
+                    17, BotDifficulty.Hard)
+                    .ChooseContract(session, hand, menu);
+
+            Assert.AreEqual(ContractType.Trump, normal.Type);
+            Assert.AreEqual(Suit.Spades, normal.TrumpSuit);
+            Assert.AreEqual(ContractType.NoTricks, hard.Type);
+            Assert.IsNull(hard.TrumpSuit);
+        }
+
         [Test]
         public void SameSeedsReplayTheSameSession()
         {
