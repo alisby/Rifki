@@ -114,18 +114,39 @@ namespace King.Tests
         {
             var west = Suited(Suit.Hearts);
             var east = Suited(Suit.Spades);
-            Swap(west, east, C(Suit.Hearts, Rank.King), C(Suit.Spades, Rank.Ace));
+            Swap(
+                west,
+                east,
+                C(Suit.Hearts, Rank.King),
+                C(Suit.Spades, Rank.Ace));
 
-            var deal = new DealEngine(new ContractCall(ContractType.KingOfHearts),
-                Hands(Suited(Suit.Clubs), west, Suited(Suit.Diamonds), east), Seat.South);
+            var deal = new DealEngine(
+                new ContractCall(ContractType.KingOfHearts),
+                Hands(
+                    Suited(Suit.Clubs),
+                    west,
+                    Suited(Suit.Diamonds),
+                    east),
+                Seat.South);
+
             deal.Play(C(Suit.Clubs, Rank.Two));
 
-            // West may discard anything. The ace of hearts is the card most
-            // likely to catch the king later, so it should go first — ahead of
-            // the equally high ace of spades.
-            Assert.AreEqual(13, deal.LegalPlays().Count);
-            var pick = new HeuristicAgent(7).ChooseCard(deal, Seat.West);
-            Assert.AreEqual(C(Suit.Hearts, Rank.Ace), pick);
+            // West is void in clubs and no longer holds K♥. Current Rıfkı
+            // rules therefore force one of West's twelve remaining hearts;
+            // A♠ is not legal. Among those hearts, A♥ is the most dangerous
+            // card and the heuristic should discard it first.
+            Assert.AreEqual(12, deal.LegalPlays().Count);
+            Assert.IsTrue(
+                deal.LegalPlays().All(
+                    c => c.Suit == Suit.Hearts));
+
+            var pick =
+                new HeuristicAgent(7)
+                    .ChooseCard(deal, Seat.West);
+
+            Assert.AreEqual(
+                C(Suit.Hearts, Rank.Ace),
+                pick);
         }
 
         [Test]

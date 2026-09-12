@@ -126,14 +126,25 @@ namespace King.Tests
         }
 
         [Test]
-        public void LeadingTrumpsIsAlwaysAllowed()
+        public void LeadingUnbrokenTrumpsIsNotAllowed()
         {
-            var deal = NewTrumpDeal(RoundRobin(), Seat.South);
-            Assert.AreEqual(13, deal.LegalPlays().Count);
-            Assert.IsNull(deal.Play(C(Suit.Hearts, Rank.Four)));
+            var deal =
+                NewTrumpDeal(RoundRobin(), Seat.South);
 
-            // A trump lead has to be followed with trumps like any other suit.
-            Assert.IsTrue(deal.LegalPlays().All(c => c.Suit == Suit.Hearts));
+            var legal = deal.LegalPlays();
+            var trump =
+                deal.HandOf(Seat.South)
+                    .First(c => c.Suit == Suit.Hearts);
+
+            Assert.IsTrue(
+                legal.All(c => c.Suit != Suit.Hearts));
+
+            CollectionAssert.DoesNotContain(
+                legal,
+                trump);
+
+            Assert.Throws<InvalidOperationException>(
+                () => deal.Play(trump));
         }
 
         [Test]

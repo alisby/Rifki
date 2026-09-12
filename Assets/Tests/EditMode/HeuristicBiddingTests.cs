@@ -23,7 +23,19 @@ namespace King.Tests
         static ContractCall Choose(IReadOnlyList<Card> hand)
         {
             var session = new Session(1);
-            return new HeuristicAgent(1).ChooseContract(session, hand, session.AvailableContracts());
+            var available = new[]
+            {
+                ContractType.NoTricks,
+                ContractType.NoHearts,
+                ContractType.NoQueens,
+                ContractType.NoMen,
+                ContractType.KingOfHearts,
+                ContractType.NoLastTwo,
+                ContractType.Trump
+            };
+
+            return new HeuristicAgent(1)
+                .ChooseContract(session, hand, available);
         }
 
         [Test]

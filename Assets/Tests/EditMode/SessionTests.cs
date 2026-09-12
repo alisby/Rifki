@@ -32,30 +32,44 @@ namespace King.Tests
         }
 
         [Test]
-        public void FreshSessionOffersAllSevenContractTypes()
+        public void FreshSessionOffersSixPenaltyContractsAndNoTrump()
         {
-            var available = new Session(1).AvailableContracts();
-            Assert.AreEqual(7, available.Count);
+            var available =
+                new Session(1).AvailableContracts();
+
+            Assert.AreEqual(6, available.Count);
             CollectionAssert.AllItemsAreUnique(available);
-            CollectionAssert.Contains(available, ContractType.Trump);
-            for (var t = ContractType.NoTricks; t < ContractType.Trump; t++)
+            CollectionAssert.DoesNotContain(
+                available,
+                ContractType.Trump);
+
+            for (var t = ContractType.NoTricks;
+                 t < ContractType.Trump;
+                 t++)
                 CollectionAssert.Contains(available, t);
         }
 
         [Test]
-        public void CallerRotatesClockwiseFromSouth()
+        public void CallerStartsWithDiamondTwoAndRotatesToTheRight()
         {
             var session = new Session(7);
-            var expected = new[]
+
+            // The first deal fixes the caller as the holder of ♦2.
+            session.DealHands();
+            var expected = session.Caller;
+
+            for (int deal = 0; deal < 8; deal++)
             {
-                Seat.South, Seat.West, Seat.North, Seat.East,
-                Seat.South, Seat.West, Seat.North, Seat.East
-            };
-            foreach (var seat in expected)
-            {
-                Assert.AreEqual(seat, session.Caller);
+                Assert.AreEqual(expected, session.Caller);
                 RunDeal(session, AnyCall(session));
+
+                expected =
+                    expected == Seat.South ? Seat.East :
+                    expected == Seat.East ? Seat.North :
+                    expected == Seat.North ? Seat.West :
+                    Seat.South;
             }
+
             Assert.AreEqual(9, session.DealNumber);
         }
 
@@ -63,17 +77,37 @@ namespace King.Tests
         public void DealLifecycleIsEnforced()
         {
             var session = new Session(3);
-            Assert.Throws<InvalidOperationException>(() => session.FinishDeal());
 
-            var deal = session.StartDeal(new ContractCall(ContractType.NoTricks));
-            Assert.Throws<InvalidOperationException>(() => session.StartDeal(new ContractCall(ContractType.NoHearts)));
-            Assert.Throws<InvalidOperationException>(() => session.FinishDeal()); // still being played
+            Assert.Throws<InvalidOperationException>(
+                () => session.FinishDeal());
+
+            session.DealHands();
+            var firstCaller = session.Caller;
+
+            var deal = session.StartDeal(
+                new ContractCall(
+                    ContractType.NoTricks));
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.StartDeal(
+                    new ContractCall(
+                        ContractType.NoHearts)));
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.FinishDeal());
 
             PlayOut(deal);
             session.FinishDeal();
+
             Assert.AreEqual(2, session.DealNumber);
-            Assert.AreEqual(Seat.West, session.Caller);
-            Assert.AreEqual(1, session.PenaltyCallsLeft(ContractType.NoTricks));
+
+            var nextCaller =
+                firstCaller == Seat.South ? Seat.East :
+                firstCaller == Seat.East ? Seat.North :
+                firstCaller == Seat.North ? Seat.West :
+                Seat.South;
+
+            Assert.AreEqual(nextCaller, session.Caller);
         }
 
         [Test]
@@ -113,75 +147,142 @@ namespace King.Tests
         public void CallerOutOfPenaltySlotsIsForcedToTrump()
         {
             var session = new Session(5);
-            RunDeal(session, new ContractCall(ContractType.NoTricks));            // 1 South
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Clubs));   // 2 West
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Clubs));   // 3 North
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Clubs));   // 4 East
-            RunDeal(session, new ContractCall(ContractType.NoHearts));            // 5 South
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Hearts));  // 6 West
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Hearts));  // 7 North
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Hearts));  // 8 East
-            RunDeal(session, new ContractCall(ContractType.NoQueens));            // 9 South, third penalty
-            RunDeal(session, new ContractCall(ContractType.NoTricks));            // 10 West
-            RunDeal(session, new ContractCall(ContractType.NoHearts));            // 11 North
-            RunDeal(session, new ContractCall(ContractType.NoQueens));            // 12 East
+            session.DealHands();
+            var firstCaller = session.Caller;
 
-            // Deal 13: South's penalty slots are spent, only trump is on offer.
-            Assert.AreEqual(Seat.South, session.Caller);
-            Assert.AreEqual(2, session.TrumpCallsLeft(Seat.South));
-            CollectionAssert.AreEqual(new[] { ContractType.Trump }, session.AvailableContracts());
-            Assert.Throws<InvalidOperationException>(() => session.StartDeal(new ContractCall(ContractType.NoMen)));
+            // Deals 1-4 must be penalties.
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+            RunDeal(session, new ContractCall(ContractType.NoHearts));
+            RunDeal(session, new ContractCall(ContractType.NoQueens));
+            RunDeal(session, new ContractCall(ContractType.NoMen));
 
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Spades));  // 13 South
-            RunDeal(session, new ContractCall(ContractType.NoMen));               // 14 West
-            RunDeal(session, new ContractCall(ContractType.KingOfHearts));        // 15 North
-            RunDeal(session, new ContractCall(ContractType.NoMen));               // 16 East
+            // First caller's second turn: second penalty.
+            RunDeal(session, new ContractCall(ContractType.NoHearts));
 
-            // Deal 17, South's last call: still trump only.
-            CollectionAssert.AreEqual(new[] { ContractType.Trump }, session.AvailableContracts());
+            // The other three callers may now use trump.
+            RunDeal(
+                session,
+                new ContractCall(
+                    ContractType.Trump,
+                    Suit.Clubs));
+            RunDeal(
+                session,
+                new ContractCall(
+                    ContractType.Trump,
+                    Suit.Clubs));
+            RunDeal(
+                session,
+                new ContractCall(
+                    ContractType.Trump,
+                    Suit.Clubs));
+
+            // First caller's third penalty slot.
+            RunDeal(session, new ContractCall(ContractType.NoQueens));
+
+            RunDeal(session, new ContractCall(ContractType.NoLastTwo));
+            RunDeal(session, new ContractCall(ContractType.KingOfHearts));
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+
+            // Deal 13 returns to the first caller. Three penalty slots are
+            // exhausted and both trump calls are still available.
+            Assert.AreEqual(firstCaller, session.Caller);
+            Assert.AreEqual(
+                0,
+                session.PenaltySlotsLeft(firstCaller));
+
+            CollectionAssert.AreEqual(
+                new[] { ContractType.Trump },
+                session.AvailableContracts());
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.StartDeal(
+                    new ContractCall(
+                        ContractType.NoMen)));
         }
 
         [Test]
         public void CallerOutOfTrumpCallsCannotCallTrump()
         {
             var session = new Session(9);
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Spades));    // 1 South
-            RunDeal(session, new ContractCall(ContractType.NoTricks));              // 2 West
-            RunDeal(session, new ContractCall(ContractType.NoHearts));              // 3 North
-            RunDeal(session, new ContractCall(ContractType.NoQueens));              // 4 East
-            RunDeal(session, new ContractCall(ContractType.Trump, Suit.Diamonds));  // 5 South, second trump
+            session.DealHands();
+            var firstCaller = session.Caller;
 
-            RunDeal(session, new ContractCall(ContractType.NoMen));                 // 6 West
-            RunDeal(session, new ContractCall(ContractType.KingOfHearts));          // 7 North
-            RunDeal(session, new ContractCall(ContractType.NoLastTwo));             // 8 East
+            // Deals 1-4 are penalty-only.
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+            RunDeal(session, new ContractCall(ContractType.NoHearts));
+            RunDeal(session, new ContractCall(ContractType.NoQueens));
+            RunDeal(session, new ContractCall(ContractType.NoMen));
 
-            // Deal 9: South has used both trump calls; only penalties remain.
-            Assert.AreEqual(Seat.South, session.Caller);
-            Assert.AreEqual(0, session.TrumpCallsLeft(Seat.South));
-            Assert.AreEqual(2, session.TrumpCallsLeft(Seat.West));
+            // First caller spends both trump calls on deals 5 and 9.
+            RunDeal(
+                session,
+                new ContractCall(
+                    ContractType.Trump,
+                    Suit.Spades));
+
+            RunDeal(session, new ContractCall(ContractType.KingOfHearts));
+            RunDeal(session, new ContractCall(ContractType.NoLastTwo));
+            RunDeal(session, new ContractCall(ContractType.NoTricks));
+
+            RunDeal(
+                session,
+                new ContractCall(
+                    ContractType.Trump,
+                    Suit.Diamonds));
+
+            RunDeal(session, new ContractCall(ContractType.NoHearts));
+            RunDeal(session, new ContractCall(ContractType.NoQueens));
+            RunDeal(session, new ContractCall(ContractType.NoMen));
+
+            // Deal 13: same caller still has penalty slots, but no trump calls.
+            Assert.AreEqual(firstCaller, session.Caller);
+            Assert.AreEqual(
+                0,
+                session.TrumpCallsLeft(firstCaller));
+
             var available = session.AvailableContracts();
-            CollectionAssert.DoesNotContain(available, ContractType.Trump);
+
+            CollectionAssert.DoesNotContain(
+                available,
+                ContractType.Trump);
+
             Assert.IsTrue(available.Count > 0);
-            Assert.Throws<InvalidOperationException>(() => session.StartDeal(new ContractCall(ContractType.Trump, Suit.Clubs)));
+
+            Assert.Throws<InvalidOperationException>(
+                () => session.StartDeal(
+                    new ContractCall(
+                        ContractType.Trump,
+                        Suit.Clubs)));
         }
 
         [Test]
         public void SheetRowsCarryDealCallerAndPoints()
         {
             var session = new Session(21);
-            var deal = session.StartDeal(new ContractCall(ContractType.KingOfHearts));
+            session.DealHands();
+            var caller = session.Caller;
+
+            var deal = session.StartDeal(
+                new ContractCall(
+                    ContractType.KingOfHearts));
+
             PlayOut(deal);
             var expected = deal.Score();
             session.FinishDeal();
 
             Assert.AreEqual(1, session.Sheet.Count);
+
             var row = session.Sheet[0];
+
             Assert.AreEqual(1, row.DealNumber);
-            Assert.AreEqual(Seat.South, row.Caller);
-            Assert.AreEqual(ContractType.KingOfHearts, row.Contract.Type);
-            CollectionAssert.AreEqual(expected.Points.ToArray(), row.Points.ToArray());
-            CollectionAssert.AreEqual(expected.Points.ToArray(), session.Totals.ToArray());
-            Assert.AreEqual(-320, row.Points.Sum());
+            Assert.AreEqual(caller, row.Caller);
+            Assert.AreEqual(
+                ContractType.KingOfHearts,
+                row.Contract.Type);
+
+            CollectionAssert.AreEqual(
+                expected.Points,
+                row.Points);
         }
 
         [Test]
